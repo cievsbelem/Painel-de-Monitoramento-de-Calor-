@@ -1,0 +1,42 @@
+[
+  {
+    "Nome": "Coordenação Geral CIEVS Belém",
+    "Email": "cievs.belem@sesma.pmb.pa.gov.br",
+    "Setor": "CIEVS Belém & Vigilância Epidemiológica"
+  },
+  {
+    "Nome": "Vigilância Epidemiológica Municipal",
+    "Email": "ve.belem@sesma.pmb.pa.gov.br",
+    "Setor": "CIEVS Belém & Vigilância Epidemiológica"
+  },
+  {
+    "Nome": "Coordenação de Atenção Primária & eMulti",
+    "Email": "aps.belem@sesma.pmb.pa.gov.br",
+    "Setor": "Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas)"
+  },
+  {
+    "Nome": "Casas e Ambulatórios Especializados",
+    "Email": "casasespecializadas@sesma.pmb.pa.gov.br",
+    "Setor": "Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas)"
+  },
+  {
+    "Nome": "Coordenação CEREST Belém",
+    "Email": "cerest_bel@sesma.pmb.pa.gov.br",
+    "Setor": "CEREST Saúde do Trabalhador"
+  },
+  {
+    "Nome": "Diretoria de Vigilância Sanitária (DEVISA)",
+    "Email": "devisa.belem@sesma.pmb.pa.gov.br",
+    "Setor": "Vigilância Sanitária e Ambiental"
+  },
+  {
+    "Nome": "Complexo Regulador de Leitos",
+    "Email": "regulacao.belem@sesma.pmb.pa.gov.br",
+    "Setor": "Regulação e Comunicação em Saúde"
+  },
+  {
+    "Nome": "Assessoria de Comunicação (ASCOM)",
+    "Email": "comunicacao.sesma@pmb.pa.gov.br",
+    "Setor": "Regulação e Comunicação em Saúde"
+  }
+]

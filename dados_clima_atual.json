@@ -1,0 +1,88 @@
+{
+    "municipio": "Belém - PA",
+    "codigo_ibge": "1501402",
+    "data_base_iso": "2026-10-26",
+    "data_base_br": "26/10/2026",
+    "hora_consulta": "15:48:53",
+    "sucesso": true,
+    "fonte_url": "https://clima.saude.gov.br/pa/belem?modo=ehf&data=2026-10-26",
+    "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE",
+    "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR",
+    "indicadores_mapa": {
+        "ehf": 0.0,
+        "media": 29.5,
+        "hoje": 34.8,
+        "pico_habitual": 34.1,
+        "tmin": 24.2,
+        "lat": -1.240717,
+        "lon": -48.459911
+    },
+    "hoje": {
+        "dia": "26 de out.",
+        "data_br": "26/10/2026",
+        "classe": "Sem excesso",
+        "ehf": 0.0,
+        "tmax": 34.8,
+        "tmin": 24.2,
+        "tmean": 29.5,
+        "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE",
+        "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"
+    },
+    "previsoes": [
+        {
+            "dia": "26 de out.",
+            "data_br": "26/10/2026",
+            "classe": "Sem excesso",
+            "ehf": 0.0,
+            "tmax": 34.8,
+            "tmin": 24.2,
+            "tmean": 29.5,
+            "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE",
+            "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"
+        },
+        {
+            "dia": "27 de out.",
+            "data_br": "27/10/2026",
+            "classe": "Sem excesso",
+            "ehf": 0.01,
+            "tmax": 35.8,
+            "tmin": 23.5,
+            "tmean": 29.6,
+            "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE",
+            "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"
+        },
+        {
+            "dia": "28 de out.",
+            "data_br": "28/10/2026",
+            "classe": "Sem excesso",
+            "ehf": 0.0,
+            "tmax": 35.8,
+            "tmin": 23.6,
+            "tmean": 29.7,
+            "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE",
+            "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"
+        },
+        {
+            "dia": "29 de out.",
+            "data_br": "29/10/2026",
+            "classe": "Sem excesso",
+            "ehf": 0.0,
+            "tmax": 34.9,
+            "tmin": 23.5,
+            "tmean": 29.2,
+            "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE",
+            "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"
+        },
+        {
+            "dia": "30 de out.",
+            "data_br": "30/10/2026",
+            "classe": "Sem excesso",
+            "ehf": 0.0,
+            "tmax": 35.2,
+            "tmin": 23.3,
+            "tmean": 29.2,
+            "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE",
+            "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"
+        }
+    ]
+}

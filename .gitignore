@@ -1,0 +1,22 @@
+# Arquivos de credenciais e variáveis de ambiente sensíveis
+.env
+.Renviron
+*.secret
+*.pem
+*.key
+
+# Arquivos locais de contatos privados (usar Secrets no GitHub Actions)
+destinatarios_privados.json
+
+# Logs e arquivos temporários de execução
+*.log
+log_coleta.log
+temp/
+tmp/
+
+# Configurações do R / RStudio / rsconnect
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata/
+rsconnect/
