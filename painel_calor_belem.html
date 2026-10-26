@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sistema Oficial de Vigilância de Excesso de Calor — CIEVS Belém / SESMA</title>
+  
+  <!-- Fontes e Estilos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Biblioteca para Download de PDF do Boletim -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    h1, h2, h3, h4, h5, h6, 
+    .titulo-padrao-escuro {
+      color: #1e3a8a !important;
+      font-weight: 700;
+      letter-spacing: 0.015em;
+      word-spacing: 0.05em;
+    }
+    
+    p, span, label {
+      color: #334155;
+    }
+    
+    @keyframes pulso-alerta {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.45); }
+      50% { transform: scale(1.012); box-shadow: 0 0 25px 8px rgba(0, 0, 0, 0.25); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.45); }
+    }
+    .alerta-pulsante {
+      animation: pulso-alerta 2.2s infinite ease-in-out;
+      border-radius: 14px;
+      letter-spacing: -0.01em;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+    
+    .alerta-pulsante, 
+    .alerta-pulsante h1, 
+    .alerta-pulsante h2, 
+    .alerta-pulsante h5, 
+    .alerta-pulsante h6, 
+    .alerta-pulsante p, 
+    .alerta-pulsante span, 
+    .alerta-pulsante i {
+      color: #ffffff !important;
+    }
+    .badge-alerta-inner {
+      background-color: rgba(255, 255, 255, 0.2) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    }
+    
+    .card-setor {
+      border-left: 5px solid #1e3a8a;
+      background-color: #ffffff;
+      border-radius: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      height: 100%;
+    }
+    .card-setor:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08) !important;
+    }
+    .card-setor h6 {
+      color: #1e3a8a !important;
+    }
+    .badge-dia {
+      font-size: 0.92rem;
+      padding: 6px 12px;
+      font-weight: 600;
+      color: #ffffff !important;
+    }
+    
+    .badge-checagem {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+      color: #ffffff !important;
+      font-weight: 600;
+      font-size: 0.88rem;
+      padding: 8px 16px;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.01em;
+    }
+    .badge-cronometro {
+      background-color: rgba(255, 255, 255, 0.22);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #ffffff !important;
+    }
+    .badge-oficial {
+      background-color: #15803d !important;
+      color: #ffffff !important;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 8px 15px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 2px 8px rgba(21, 128, 61, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lista-acoes-integra {
+      padding-left: 1.25rem;
+      margin-bottom: 0;
+    }
+    .lista-acoes-integra li {
+      margin-bottom: 0.55rem;
+      color: #334155;
+      font-size: 0.91rem;
+      line-height: 1.5;
+    }
+    .header-logo-box {
+      display: inline-flex;
+      align-items: center;
+      height: 58px;
+    }
+
+    /* ESTILOS DO MAPA DE BAIRROS */
+    #mapa-bairros-belem {
+      height: 520px;
+      width: 100%;
+      border-radius: 10px;
+      z-index: 1;
+      border: 1px solid #cbd5e1;
+    }
+    .badge-marcador-bairro {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+      border: 2px solid;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .badge-marcador-bairro:hover {
+      transform: scale(1.12);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.35);
+      z-index: 9999 !important;
+    }
+    .badge-temp-valor {
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 1px 7px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .btn-filtro-distrito {
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 20px;
+      padding: 3px 10px;
+      transition: all 0.2s ease;
+    }
+    .pill-bairro-item {
+      font-size: 0.78rem;
+      cursor: pointer;
+      border-radius: 15px;
+      padding: 3px 9px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pill-bairro-item:hover {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+    }
+
+    /* BOTÕES INSTITUCIONAIS DO TOPO: AZUL ESCURO E LETRAS EM BRANCO */
+    .btn-topo-ms,
+    .btn-topo-boletim,
+    #btn-abrir-boletim {
+      background-color: #1e3a8a !important;
+      color: #ffffff !important;
+      border: 1px solid #1e3a8a !important;
+      font-weight: 700 !important;
+      border-radius: 8px !important;
+      box-shadow: 0 2px 6px rgba(30, 58, 138, 0.35) !important;
+      transition: all 0.2s ease-in-out !important;
+    }
+    .btn-topo-ms:hover,
+    .btn-topo-boletim:hover,
+    #btn-abrir-boletim:hover {
+      background-color: #172554 !important;
+      border-color: #172554 !important;
+      color: #ffffff !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(30, 58, 138, 0.45) !important;
+    }
+    .btn-topo-ms *,
+    .btn-topo-boletim *,
+    #btn-abrir-boletim * {
+      color: #ffffff !important;
+    }
+    
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      .modal {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+      .modal-dialog {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .modal-content {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+      }
+      .modal-header, .no-print, .btn, .nav-tabs {
+        display: none !important;
+      }
+      #conteudo-boletim, #conteudo-boletim * {
+        visibility: visible !important;
+      }
+      #conteudo-boletim {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .boletim-documento {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+      .card-setor {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body class="p-3 p-md-4">
+
+  <div class="container-fluid max-w-7xl">
+    
+    <!-- CABEÇALHO INSTITUCIONAL -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center py-3 px-4 mb-3 border-bottom shadow-sm bg-white rounded-3 gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <!-- Logo Oficial SESMA -->
+        <div class="header-logo-box">
+          <img src="data:image/png;base64,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" alt="SESMA - Secretaria Municipal de Saúde de Belém" style="height: 54px; width: auto; object-fit: contain;">
+        </div>
+        
+        <div class="ms-1">
+          <h4 class="m-0 titulo-padrao-escuro fw-bold">SISTEMA OFICIAL DE VIGILÂNCIA DE EXCESSO DE CALOR</h4>
+          <p class="text-muted m-0 small">SESMA / Prefeitura de Belém · Monitoramento de excesso de Calor em Belém · Plano de Contingência 2026</p>
+        </div>
+      </div>
+      
+      <div class="text-end d-flex flex-wrap align-items-center gap-2">
+        <a href="https://clima.saude.gov.br/pa/belem?data=2026-10-27&modo=ehf" target="_blank" rel="noopener noreferrer" class="btn btn-topo-ms btn-sm fw-bold shadow-sm d-inline-flex align-items-center gap-2 px-3 py-2" title="Acessar página oficial do Ministério da Saúde" onclick="window.open(this.href, '_blank');">
+          <i class="bi bi-box-arrow-up-right"></i>
+          <span>Ministério da Saúde</span>
+        </a>
+        <button type="button" id="btn-abrir-boletim" class="btn btn-topo-boletim btn-sm fw-bold shadow-sm d-inline-flex align-items-center gap-2 px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalBoletim" title="Gerar Boletim Oficial do Clima">
+          <i class="bi bi-file-earmark-text-fill fs-5"></i>
+          <span>Boletim: Informe do Clima em Belém</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- BANNER DE ALERTA PULSANTE -->
+    <div id="bloco-alerta" class="alerta-pulsante p-4 mb-4 text-center shadow-lg" style="background-color: #1b5e20; border: 3px solid rgba(255,255,255,0.7);">
+      <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Carregando dados bioclimáticos...</span>
+      </div>
+    </div>
+    
+    <!-- CARD: O QUE FAZER HOJE (RECOMENDAÇÕES GERAIS) -->
+    <div class="card shadow-sm mb-4 border-0 rounded-3">
+      <div class="card-header bg-light py-2 px-3 fw-bold titulo-padrao-escuro d-flex justify-content-between align-items-center">
+        <div>
+          <div><i class="bi bi-table"></i> O QUE FAZER HOJE</div>
+          <div class="small fw-normal text-muted" style="font-size: 0.82rem; margin-top: 1px;">(RECOMENDAÇÕES GERAIS)</div>
+        </div>
+        <span class="small text-muted text-end">Base Operacional Oficial: EHF (Intensidade do Calor vs. Climatologia Histórica)</span>
+      </div>
+      <div class="card-body">
+        <div id="quadro-orientacoes">
+          <!-- Injetado dinamicamente via app.js -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- CARD: PREVISÃO OPERACIONAL DE CALOR -->
+    <div class="card shadow-sm mb-4 border-0 rounded-3">
+      <div class="card-header bg-light py-2 px-3 fw-bold titulo-padrao-escuro">
+        <div><i class="bi bi-calendar3"></i> PREVISÃO OPERACIONAL DE CALOR</div>
+        <div class="small fw-normal text-muted" style="font-size: 0.82rem; margin-top: 1px;">
+          (D+0 A D+4) — D+0 é a medição/previsão atual; D+1 a D+4 sinalizam a tendência para Belém
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="grade-previsao">
+          <!-- Injetado dinamicamente via app.js -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- MAPA OFICIAL DE VIGILÂNCIA BIOCLIMÁTICA — BELÉM / PA -->
+    <div class="card shadow-sm mb-4 border-0 rounded-3" id="card-mapa-belem">
+      <div class="card-header bg-light py-2 px-3 fw-bold titulo-padrao-escuro d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-geo-alt-fill text-danger fs-5"></i>
+            <span class="fs-6">MAPA OFICIAL DE VIGILÂNCIA BIOCLIMÁTICA — BELÉM / PA</span>
+          </div>
+          <div class="small fw-normal text-muted" style="font-size: 0.82rem; margin-top: 1px;">
+            Alimentação Automática Oficial do Ministério da Saúde (EHF / ECMWF) · Município de Belém (IBGE: 1501402)
+          </div>
+        </div>
+        <span class="badge px-3 py-2 fs-6 shadow-sm" style="background-color: #1e3a8a; color: #ffffff;">
+          <i class="bi bi-shield-check text-white me-1"></i> Dados Oficiais do Ministério da Saúde
+        </span>
+      </div>
+      <div class="card-body p-3">
+        <!-- Indicadores Oficiais Dispostos Acima do Mapa: EHF, Média, Hoje, Pico habitual -->
+        <div class="row g-2 mb-3" id="destaques-termicos-oficiais">
+          <!-- 1. EHF -->
+          <div class="col-6 col-md-3">
+            <div class="card p-3 border-0 shadow-sm rounded-3 h-100" style="border-left: 5px solid #16a34a !important; background: #fff;">
+              <div class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
+                <i class="bi bi-activity text-success fs-6"></i> EHF
+              </div>
+              <div class="d-flex align-items-baseline gap-2 mt-1">
+                <h3 class="fw-bold mb-0 text-dark" id="kpi-mapa-ehf">0.0</h3>
+                <span class="badge bg-success text-white small" id="kpi-mapa-classe">Sem Excesso</span>
+              </div>
+              <div class="small text-muted mt-1" style="font-size: 0.76rem;">Fator de Excesso de Calor (MS)</div>
+            </div>
+          </div>
+          <!-- 2. Média -->
+          <div class="col-6 col-md-3">
+            <div class="card p-3 border-0 shadow-sm rounded-3 h-100" style="border-left: 5px solid #0284c7 !important; background: #fff;">
+              <div class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
+                <i class="bi bi-thermometer-half text-primary fs-6"></i> Média
+              </div>
+              <div class="d-flex align-items-baseline gap-2 mt-1">
+                <h3 class="fw-bold mb-0 text-dark" id="kpi-mapa-media">29.5°C</h3>
+                <span class="badge bg-primary text-white small">Tmean</span>
+              </div>
+              <div class="small text-muted mt-1" style="font-size: 0.76rem;">Temperatura média de 24h</div>
+            </div>
+          </div>
+          <!-- 3. Hoje -->
+          <div class="col-6 col-md-3">
+            <div class="card p-3 border-0 shadow-sm rounded-3 h-100" style="border-left: 5px solid #ea580c !important; background: #fff;">
+              <div class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
+                <i class="bi bi-thermometer-sun text-warning fs-6"></i> Hoje
+              </div>
+              <div class="d-flex align-items-baseline gap-2 mt-1">
+                <h3 class="fw-bold mb-0 text-dark" id="kpi-mapa-hoje">34.8°C</h3>
+                <span class="badge bg-warning text-dark small">Tmax</span>
+              </div>
+              <div class="small text-muted mt-1" style="font-size: 0.76rem;">Máxima prevista para hoje</div>
+            </div>
+          </div>
+          <!-- 4. Pico habitual -->
+          <div class="col-6 col-md-3">
+            <div class="card p-3 border-0 shadow-sm rounded-3 h-100" style="border-left: 5px solid #dc2626 !important; background: #fff;">
+              <div class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
+                <i class="bi bi-graph-up-arrow text-danger fs-6"></i> Pico habitual
+              </div>
+              <div class="d-flex align-items-baseline gap-2 mt-1">
+                <h3 class="fw-bold mb-0 text-dark" id="kpi-mapa-pico">34.1°C</h3>
+                <span class="badge bg-danger text-white small">P75 Clima</span>
+              </div>
+              <div class="small text-muted mt-1" style="font-size: 0.76rem;">Climatologia percentil 75 MS</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra com Mecanismo Automático de Seleção de Níveis (D+0 a D+4) -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2 p-2 rounded-2" style="background: #f1f5f9; border: 1px solid #e2e8f0;">
+          <div class="d-flex align-items-center gap-2 flex-wrap" id="barra-botoes-dias-mapa">
+            <span class="small fw-bold text-muted text-uppercase"><i class="bi bi-sliders"></i> Alternância de Projeção no Mapa:</span>
+            <!-- Injetado dinamicamente via app.js -->
+          </div>
+          <span class="badge bg-light text-muted border" style="font-size: 0.75rem;">Clique para alternar o nível operacional no mapa</span>
+        </div>
+
+        <!-- Container do Mapa Oficial Leaflet de Belém -->
+        <div class="position-relative">
+          <div id="mapa-belem-oficial" style="height: 500px; width: 100%; border-radius: 10px; border: 1px solid #cbd5e1; z-index: 1;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD: AÇÕES DOS SETORES DE BELÉM -->
+    <div class="mb-3 mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h4 class="fw-bold titulo-padrao-escuro m-0"><i class="bi bi-diagram-3-fill"></i> AÇÕES DE RESPOSTA DOS SETORES DE BELÉM (PARA O NÍVEL VIGENTE)</h4>
+      <div id="badge-coe-status">
+        <!-- Injetado dinamicamente via app.js -->
+      </div>
+    </div>
+    <div id="quadro-acoes-setores" class="mb-4">
+      <!-- Injetado dinamicamente via app.js -->
+    </div>
+    
+    <!-- RODAPÉ -->
+    <div class="text-center text-muted py-3 border-top small">
+      <p class="mb-1">
+        Endereço Oficial Monitorado: <a href="https://clima.saude.gov.br/pa/belem?data=2026-10-27&modo=ehf" target="_blank" class="text-decoration-none">https://clima.saude.gov.br/pa/belem?data=2026-10-27&modo=ehf</a>
+      </p>
+      <p class="mb-0">
+        Ministério da Saúde (EHF Nairn & Fawcett) · CIEVS Belém / SESMA (Plano de Enfrentamento ao Calor Extremo 2026).
+      </p>
+    </div>
+    
+  </div>
+
+  <!-- MODAL: BOLETIM - INFORME DO CLIMA EM BELÉM -->
+  <div class="modal fade" id="modalBoletim" tabindex="-1" aria-labelledby="modalBoletimLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white d-flex justify-content-between align-items-center py-2 px-3 no-print">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-file-earmark-text-fill text-warning fs-4"></i>
+            <h5 class="modal-title fw-bold text-white m-0" id="modalBoletimLabel">Boletim Oficial: Informe do Clima em Belém</h5>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-danger btn-sm fw-bold d-flex align-items-center gap-1 shadow-sm btn-baixar-pdf" onclick="baixarBoletimPDF()">
+              <i class="bi bi-file-earmark-pdf-fill"></i> Baixar Arquivo em PDF
+            </button>
+            <button type="button" class="btn btn-outline-light btn-sm fw-bold d-flex align-items-center gap-1" onclick="imprimirBoletim()">
+              <i class="bi bi-printer-fill"></i> Imprimir
+            </button>
+            <button type="button" class="btn btn-outline-light btn-sm fw-bold" data-bs-dismiss="modal">
+              <i class="bi bi-x-lg"></i> Fechar
+            </button>
+          </div>
+        </div>
+        <div class="modal-body p-3 p-md-4 bg-light" id="conteudo-boletim">
+          <!-- Renderizado dinamicamente via app.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+
+window.DADOS_CLIMA_EMBUTIDOS = {"municipio": "Belém - PA", "codigo_ibge": "1501402", "data_base_iso": "2026-10-26", "data_base_br": "26/10/2026", "hora_consulta": "15:48:53", "sucesso": true, "fonte_url": "https://clima.saude.gov.br/pa/belem?modo=ehf&data=2026-10-26", "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE", "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR", "indicadores_mapa": {"ehf": 0.0, "media": 29.5, "hoje": 34.8, "pico_habitual": 34.1, "tmin": 24.2, "lat": -1.240717, "lon": -48.459911}, "hoje": {"dia": "26 de out.", "data_br": "26/10/2026", "classe": "Sem excesso", "ehf": 0.0, "tmax": 34.8, "tmin": 24.2, "tmean": 29.5, "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE", "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"}, "previsoes": [{"dia": "26 de out.", "data_br": "26/10/2026", "classe": "Sem excesso", "ehf": 0.0, "tmax": 34.8, "tmin": 24.2, "tmean": 29.5, "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE", "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"}, {"dia": "27 de out.", "data_br": "27/10/2026", "classe": "Sem excesso", "ehf": 0.01, "tmax": 35.8, "tmin": 23.5, "tmean": 29.6, "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE", "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"}, {"dia": "28 de out.", "data_br": "28/10/2026", "classe": "Sem excesso", "ehf": 0.0, "tmax": 35.8, "tmin": 23.6, "tmean": 29.7, "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE", "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"}, {"dia": "29 de out.", "data_br": "29/10/2026", "classe": "Sem excesso", "ehf": 0.0, "tmax": 34.9, "tmin": 23.5, "tmean": 29.2, "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE", "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"}, {"dia": "30 de out.", "data_br": "30/10/2026", "classe": "Sem excesso", "ehf": 0.0, "tmax": 35.2, "tmin": 23.3, "tmean": 29.2, "titulo_nivel": "NÍVEL DE CALOR 1: NORMALIDADE", "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR"}]};
+window.MALHA_BELEM_EMBUTIDA = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Polygon", "coordinates": [[[-48.6244, -1.1922], [-48.6217, -1.2035], [-48.6119, -1.2249], [-48.6005, -1.2463], [-48.5882, -1.2662], [-48.5728, -1.288], [-48.5607, -1.3004], [-48.5542, -1.3139], [-48.55, -1.3335], [-48.5477, -1.3474], [-48.5452, -1.3544], [-48.5359, -1.365], [-48.5258, -1.3778], [-48.5152, -1.3943], [-48.5122, -1.4086], [-48.5113, -1.4205], [-48.5132, -1.4314], [-48.5167, -1.4449], [-48.5187, -1.4562], [-48.5182, -1.4686], [-48.5154, -1.4783], [-48.5114, -1.4876], [-48.5092, -1.4937], [-48.5104, -1.505], [-48.5108, -1.5102], [-48.5111, -1.5185], [-48.5095, -1.5261], [-48.5063, -1.5266], [-48.5033, -1.5239], [-48.5004, -1.5182], [-48.5, -1.5134], [-48.4998, -1.5048], [-48.4966, -1.5032], [-48.4925, -1.5049], [-48.4841, -1.5128], [-48.4819, -1.5152], [-48.4785, -1.5178], [-48.4753, -1.5197], [-48.4724, -1.5211], [-48.4645, -1.5226], [-48.4607, -1.5224], [-48.4574, -1.5218], [-48.4537, -1.5203], [-48.4485, -1.517], [-48.4425, -1.5138], [-48.4398, -1.5122], [-48.4354, -1.5102], [-48.4312, -1.5092], [-48.4276, -1.5088], [-48.4176, -1.5102], [-48.4147, -1.5103], [-48.4104, -1.5094], [-48.4033, -1.5056], [-48.3994, -1.5032], [-48.3958, -1.5004], [-48.391, -1.4958], [-48.3882, -1.494], [-48.3848, -1.4931], [-48.3754, -1.4915], [-48.3729, -1.49], [-48.3698, -1.4857], [-48.365, -1.4786], [-48.3631, -1.4762], [-48.3605, -1.4737], [-48.355, -1.4707], [-48.3511, -1.4696], [-48.3447, -1.4694], [-48.3376, -1.4709], [-48.3345, -1.471], [-48.3325, -1.4702], [-48.3316, -1.4686], [-48.3318, -1.4669], [-48.3311, -1.4649], [-48.332, -1.4629], [-48.334, -1.4618], [-48.3437, -1.4558], [-48.3455, -1.4537], [-48.3455, -1.4513], [-48.3474, -1.4549], [-48.3503, -1.4569], [-48.357, -1.4601], [-48.3628, -1.4623], [-48.3692, -1.464], [-48.3778, -1.4643], [-48.3852, -1.4655], [-48.3894, -1.4658], [-48.3935, -1.4657], [-48.3965, -1.4651], [-48.4, -1.4648], [-48.4003, -1.4641], [-48.3993, -1.4599], [-48.399, -1.4556], [-48.3992, -1.4546], [-48.4004, -1.453], [-48.4003, -1.4514], [-48.3992, -1.4502], [-48.3973, -1.4493], [-48.3925, -1.45], [-48.3905, -1.4493], [-48.3872, -1.4454], [-48.3843, -1.4441], [-48.3836, -1.4389], [-48.382, -1.4354], [-48.3812, -1.4319], [-48.38, -1.4306], [-48.3788, -1.4302], [-48.3789, -1.4283], [-48.3772, -1.4275], [-48.3765, -1.428], [-48.375, -1.4271], [-48.3755, -1.4262], [-48.3742, -1.4251], [-48.3724, -1.4255], [-48.3714, -1.423], [-48.3717, -1.4216], [-48.3712, -1.42], [-48.3715, -1.4173], [-48.3738, -1.4155], [-48.3746, -1.4121], [-48.374, -1.4065], [-48.3739, -1.403], [-48.3835, -1.4091], [-48.3843, -1.4069], [-48.3906, -1.4087], [-48.3935, -1.4004], [-48.3942, -1.3989], [-48.3944, -1.3911], [-48.3981, -1.3928], [-48.3979, -1.4004], [-48.4018, -1.4023], [-48.4046, -1.403], [-48.4074, -1.4046], [-48.4074, -1.4056], [-48.4103, -1.4073], [-48.4106, -1.3942], [-48.4125, -1.3964], [-48.4148, -1.398], [-48.4176, -1.398], [-48.4175, -1.4002], [-48.4184, -1.4002], [-48.4184, -1.4033], [-48.4243, -1.4067], [-48.4249, -1.3988], [-48.4286, -1.4032], [-48.43, -1.4041], [-48.4299, -1.3945], [-48.431, -1.3941], [-48.4298, -1.3889], [-48.4339, -1.3866], [-48.4354, -1.3846], [-48.4333, -1.3809], [-48.4308, -1.3784], [-48.43, -1.3771], [-48.4282, -1.3793], [-48.4239, -1.3739], [-48.4222, -1.3733], [-48.4214, -1.3693], [-48.4225, -1.3685], [-48.4252, -1.364], [-48.4264, -1.3617], [-48.4295, -1.356], [-48.4325, -1.3503], [-48.4354, -1.346], [-48.4373, -1.344], [-48.4401, -1.3441], [-48.4393, -1.3426], [-48.4366, -1.342], [-48.4356, -1.3423], [-48.4344, -1.3417], [-48.433, -1.3394], [-48.4325, -1.3368], [-48.4338, -1.3365], [-48.4332, -1.3352], [-48.4308, -1.3339], [-48.43, -1.3319], [-48.4303, -1.3308], [-48.4277, -1.328], [-48.4264, -1.3273], [-48.4262, -1.3263], [-48.4271, -1.3233], [-48.426, -1.3185], [-48.4261, -1.3171], [-48.4253, -1.3158], [-48.4233, -1.3149], [-48.4222, -1.313], [-48.4226, -1.3109], [-48.424, -1.3071], [-48.4241, -1.3035], [-48.426, -1.299], [-48.427, -1.2921], [-48.4283, -1.2892], [-48.4289, -1.2857], [-48.4273, -1.2822], [-48.4253, -1.2793], [-48.4222, -1.2753], [-48.4209, -1.2733], [-48.4205, -1.2712], [-48.4207, -1.2685], [-48.4219, -1.2659], [-48.4261, -1.2618], [-48.4276, -1.2595], [-48.4276, -1.2572], [-48.4263, -1.2544], [-48.423, -1.252], [-48.4187, -1.251], [-48.414, -1.2483], [-48.4104, -1.2435], [-48.4075, -1.2386], [-48.4076, -1.2279], [-48.4054, -1.2258], [-48.3986, -1.2249], [-48.3945, -1.2245], [-48.3911, -1.2257], [-48.3879, -1.2291], [-48.3861, -1.2323], [-48.3813, -1.2392], [-48.3786, -1.2421], [-48.3744, -1.2434], [-48.3706, -1.2412], [-48.3685, -1.2354], [-48.3673, -1.2324], [-48.3655, -1.2298], [-48.3607, -1.2261], [-48.3575, -1.2247], [-48.353, -1.221], [-48.352, -1.2178], [-48.3514, -1.214], [-48.3482, -1.2119], [-48.345, -1.2086], [-48.3449, -1.2053], [-48.3422, -1.2038], [-48.3388, -1.203], [-48.3361, -1.2007], [-48.3325, -1.1944], [-48.3277, -1.188], [-48.3259, -1.1853], [-48.3233, -1.1826], [-48.3213, -1.1798], [-48.3187, -1.1757], [-48.3161, -1.1722], [-48.3136, -1.1684], [-48.312, -1.1656], [-48.3101, -1.163], [-48.3075, -1.1606], [-48.3022, -1.1565], [-48.3008, -1.1539], [-48.2999, -1.15], [-48.2991, -1.1437], [-48.2993, -1.1406], [-48.299, -1.1372], [-48.2983, -1.1339], [-48.2971, -1.1308], [-48.2961, -1.1275], [-48.2963, -1.1245], [-48.298, -1.1178], [-48.2986, -1.1146], [-48.2995, -1.1114], [-48.3018, -1.1064], [-48.3043, -1.101], [-48.3085, -1.0942], [-48.3104, -1.0915], [-48.3146, -1.0851], [-48.3173, -1.079], [-48.3184, -1.0752], [-48.3216, -1.0655], [-48.3238, -1.0597], [-48.3627, -1.0489], [-48.4695, -1.0194], [-48.4742, -1.0238], [-48.4855, -1.0315], [-48.4875, -1.0339], [-48.4931, -1.0384], [-48.4951, -1.0415], [-48.4969, -1.0453], [-48.5004, -1.0491], [-48.5029, -1.0527], [-48.5135, -1.0661], [-48.5245, -1.0839], [-48.5338, -1.0943], [-48.548, -1.1113], [-48.5745, -1.1393], [-48.6075, -1.1721], [-48.6244, -1.1922]]]}, "properties": {"codarea": "1501402"}}]};
+
+// ==============================================================================
+// SISTEMA OFICIAL DE VIGILÂNCIA DE EXCESSO DE CALOR - CIEVS BELÉM / SESMA
+// Aplicação Web Estática para GitHub Pages com Alimentação via GitHub Actions CRON
+// ==============================================================================
+
+const matrizNiveis = {
+  "Sem excesso": {
+    classe: "Sem excesso",
+    tituloNivel: "NÍVEL DE CALOR 1: NORMALIDADE",
+    subtituloEhf: "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR",
+    rotuloCurto: "NÍVEL 1: NORMALIDADE",
+    corAlerta: "#1b5e20",
+    corTexto: "#ffffff",
+    icone: "bi-check-circle-fill",
+    statusMs: "CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR",
+    nivelContingencia: "NÍVEL DE CALOR 1: NORMALIDADE",
+    populacao: "Rotina, sem cuidado extra.",
+    servicoSaude: "Vigilância de rotina, com a rede em prontidão.",
+    coeBadge: '<span class="badge bg-success fs-6 p-2 text-white"><i class="bi bi-shield-check"></i> OPERAÇÃO ROTINEIRA / NORMALIDADE</span>',
+    acoesSetores: {
+      cievsVe: [
+        "CIEVS: Manter Vigilância Baseada em Eventos (VBE) para identificação precoce de rumores relacionados ao calor extremo.",
+        "CIEVS: Avaliar sinais de aumento incomum de atendimentos.",
+        "CIEVS: Desenvolver formulário de notificação ou variável que indique adoecimento pelo aumento de temperatura.",
+        "Vigilância Epidemiológica: Capacitar profissionais de saúde, especialmente os que trabalham nos territórios sobre alerta e enfrentamento ao El Niño.",
+        "Vigilância Epidemiológica: Elaborar e divulgar materiais instrutivos para população sobre medidas de prevenção para minimizar adoecimentos relacionados a ondas de calor.",
+        "Vigilância Epidemiológica: Elaboração e divulgação de materiais instrutivos aos profissionais dos serviços de saúde quanto aos registros de informações necessárias a facilitação da identificação dos atendimentos relacionados ao calor.",
+        "Vigilância Epidemiológica: Elaboração do plano de contingência em conjunto com CIEVS para eventos climáticos extremos de maneira colaborativa com outros setores.",
+        "Vigilância Epidemiológica: Reuniões intersetoriais sempre que necessário para planejamento, monitoramento, avaliação e resposta aos eventos climáticos.",
+        "Vigilância Epidemiológica: Monitorar doenças sensíveis aos eventos climáticos.",
+        "Vigilância Epidemiológica: Qualificar notificações e acompanhar indicadores epidemiológicos.",
+        "NHE: Realizar busca ativa em prontuários eletrônicos e presencial de atendimentos relacionados à exposição de calor extremo.",
+        "NHE: Divulgar a notificação de exposição ao calor extremo e capacitar as equipes no preenchimento e fluxos de comunicação.",
+        "NHE: Apoiar na elaboração de protocolos de atendimento, fluxos internos e possíveis contingenciamentos diante de excesso de demanda de atendimentos."
+      ],
+      controleEndemias: [
+        "Visita Domiciliar: Inspeção de imóveis para identificação de criadouros do Aedes aegypti. Orientação aos moradores sobre prevenção e eliminação de focos.",
+        "Instalação e Manutenção de Estações Disseminadoras de Larvicidas (EDLs).",
+        "Monitoramento Entomológico: Bloqueio de Transmissão.",
+        "Controle Químico.",
+        "Inspeção de Pontos Estratégicos (PE).",
+        "Inspeção de Imóveis Especiais (IE).",
+        "Educação em Saúde.",
+        "Registro e Monitoramento das Atividades."
+      ],
+      vigSanitariaAmbiental: [
+        "Vigilância Sanitária: Elaborar e manter atualizado o Plano Operacional de atuação da Vigilância Sanitária para eventos de calor extremo.",
+        "Vigilância Sanitária: Mapear e manter cadastro atualizado dos estabelecimentos prioritários para fiscalização, incluindo serviços de saúde, instituições de longa permanência para idosos, serviços de alimentação, estabelecimentos de ensino, eventos de massa e demais locais de interesse sanitário.",
+        "Vigilância Sanitária: Capacitar as equipes para atuação em situações de calor extremo e atualizar os protocolos de inspeção sanitária.",
+        "Vigilância Sanitária: Desenvolver ações educativas e orientações técnicas aos estabelecimentos sujeitos à Vigilância Sanitária quanto às medidas de prevenção dos riscos relacionados ao calor.",
+        "Vigilância Sanitária: Integrar-se ao CIEVS e demais áreas da Vigilância em Saúde para monitoramento do cenário epidemiológico e climático.",
+        "Vigilância Ambiental: Classificar o monitoramento da qualidade da água, qualidade do ar, queimadas e vetores.",
+        "Vigilância Ambiental: Monitorar áreas com risco de desabastecimento de água.",
+        "Vigilância Ambiental: Apoiar ações de prevenção e controle ambiental."
+      ],
+      trabalhador: [
+        "Realizar ações de educação em saúde com os grupos de trabalhadores vulneráveis voltadas à prevenção do impacto do calor nos trabalhadores.",
+        "Articular com empregadores/serviços privados e públicos a distribuição de EPIs para os grupos de trabalhadores vulneráveis (trabalhadores ao ar livre e trabalhadores expostos a fontes de calor).",
+        "Capacitar empregadores/serviços públicos e privados e estabelecimentos de saúde a preencher as fichas de notificação do SINAN relacionadas ao trabalho de trabalhadores que tenham sofrido impactos na saúde devido ao calor.",
+        "Capacitar os grupos de trabalhadores vulneráveis sobre os sinais e sintomas da exposição ao calor excessivo.",
+        "Articular com empregadores/serviços públicos e privados o ajuste da carga horária de grupos de trabalhadores vulneráveis nos Níveis de alerta 1, 2 e 3.",
+        "Articular um fluxograma de envio de fichas de notificação do SINAN.",
+        "Criar canal de denúncia para trabalhadores que observarem serviços públicos e privados que não cumpram as recomendações de prevenção ao calor dos níveis 1, 2 e 3."
+      ],
+      atencaoSaude: [
+        "DAS: Avaliar a capacidade operacional da rede de atenção em saúde.",
+        "DAS: Monitorar a disponibilidade de profissionais, medicamentos, insumos e equipamentos.",
+        "DAS: Reforçar a comunicação entre os pontos da rede assistencial.",
+        "APS: Realizar ações educativas nas unidades de saúde e no território.",
+        "APS: Realizar busca ativa e acompanhamento dos grupos vulneráveis.",
+        "APS: Orientar usuários quanto a hidratação, alimentação, proteção contra o calor e reconhecimento precoce dos sinais de gravidade.",
+        "DAES: Mapear a capacidade de climatização das salas de acolhimento e retaguarda de usuários crônicos e especializados.",
+        "SAMU: Revisar protocolos assistenciais e verificar equipamentos e insumos."
+      ],
+      regulacaoComunicacao: [
+        "Central de Leitos: Monitorar diariamente a disponibilidade de leitos e serviços especializados.",
+        "Central de Leitos: Revisar fluxos de encaminhamento conforme necessidade.",
+        "Central de Leitos: Mapear a capacidade de climatização das enfermarias e UTIs da rede contratualizada para identificar pontos críticos de suporte térmico.",
+        "Central de Leitos: Manter Censo hospitalar diário atualizado; Relatório de conformidade de climatização hospitalar.",
+        "ASCOM: Combater informações falsas por meio da comunicação de risco.",
+        "ASCOM: Orientar a população sobre medidas de prevenção em canais de atendimento."
+      ]
+    }
+  },
+  
+  "Baixo": {
+    classe: "Baixo",
+    tituloNivel: "NÍVEL DE CALOR 2: ATENÇÃO",
+    subtituloEhf: "CLASSIFICAÇÃO DO EHF: BAIXO",
+    rotuloCurto: "NÍVEL 2: ATENÇÃO",
+    corAlerta: "#ca8a04",
+    corTexto: "#ffffff",
+    icone: "bi-exclamation-circle-fill",
+    statusMs: "CLASSIFICAÇÃO DO EHF: BAIXO",
+    nivelContingencia: "NÍVEL DE CALOR 2: ATENÇÃO",
+    populacao: "Beba água ao longo do dia, mesmo sem sede.",
+    servicoSaude: "Comunicar os sinais de mal-estar pelo calor e reforçar a hidratação, com atenção aos grupos de risco.",
+    coeBadge: '<span class="badge fs-6 p-2 text-white" style="background-color: #ca8a04 !important;"><i class="bi bi-shield-exclamation"></i> OPERAÇÃO EM NÍVEL DE ATENÇÃO</span>',
+    acoesSetores: {
+      cievsVe: [
+        "CIEVS: Monitorar DNC relacionados à variação do clima.",
+        "CIEVS: Ativar monitoramento diário dos eventos de notificações relacionados à exposição ao calor extremo.",
+        "CIEVS: Produzir informes epidemiológicos periodicamente.",
+        "CIEVS: Compartilhar informações com setores estratégicos.",
+        "CIEVS: Realizar a avaliação de risco semanalmente ou sempre que necessário.",
+        "CIEVS: Monitorar eventos de massa e ou de grande porte na cidade.",
+        "Vigilância Epidemiológica: Emissão de Boletins epidemiológicos em conjunto com CIEVS para nortear ações da assistência à saúde relacionadas ao calor no intuito de melhorar estratégias de prevenção e resposta.",
+        "Vigilância Epidemiológica: Monitoramento epidemiológico através da avaliação dos impactos das ondas de calor na saúde da população através da detecção do aumento do número de casos de atendimentos, notificações, internações e óbitos associados a alta temperatura, especialmente em grupos vulneráveis.",
+        "Vigilância Epidemiológica: Reuniões intersetoriais sempre que necessário para planejamento, monitoramento, avaliação e resposta aos eventos climáticos.",
+        "NHE: Intensificação de busca ativa em prontuários eletrônicos e presencial de atendimentos relacionados à exposição de calor extremo.",
+        "NHE: Fortalecimento da notificação e comunicação imediata dos casos."
+      ],
+      controleEndemias: [
+        "Período da Manhã (07:30 às 10:30): Visitas domiciliares, inspeção de imóveis, tratamento focal, instalação e manutenção de EDLs, instalação e leitura de ovitrampas, levantamento entomológicos, controle mecânico de criadouros.",
+        "Período da Tarde: Priorizar as atividades em Imóveis Especiais (IE).",
+        "Medidas de Proteção dos profissionais ACE: Pausas de 10 minutos a cada hora, hidratação, resfriamento, e reaplicação de protetor solar."
+      ],
+      vigSanitariaAmbiental: [
+        "Vigilância Sanitária: Intensificar inspeções em estabelecimentos prioritários (hospitais, UPAs, ILPIs, escolas, creches, supermercados, serviços de alimentação, hotéis, shopping centers, clubes recreativos e eventos de massa).",
+        "Vigilância Sanitária: Verificar as condições de abastecimento de água, climatização, conservação de alimentos, funcionamento da cadeia de frio e armazenamento de medicamentos termolábeis.",
+        "Vigilância Sanitária: Orientar os responsáveis pelos estabelecimentos quanto às medidas preventivas para redução dos riscos decorrentes do calor extremo.",
+        "Vigilância Sanitária: Intensificar a fiscalização das condições higiênico-sanitárias dos serviços sujeitos à Vigilância Sanitária.",
+        "Vigilância Sanitária: Compartilhar informações relevantes com o CIEVS para subsidiar a avaliação de risco.",
+        "Vigilância Ambiental: Intensificar o monitoramento do desabastecimento de água.",
+        "Vigilância Ambiental: Reforçar as ações de fiscalização em ambientes de assistência à saúde e serviços essenciais."
+      ],
+      trabalhador: [
+        "Monitorar a distribuição de EPIs para os grupos de trabalhadores vulneráveis (trabalhadores ao ar livre e expostos a fontes de calor).",
+        "Monitorar a realização de medidas protetivas dos empregadores/serviços públicos e privados que contenham grupos de trabalhadores vulneráveis.",
+        "Monitorar a saúde dos grupos de trabalhadores vulneráveis através das fichas de notificação relacionadas ao trabalho do SINAN.",
+        "Contatar os serviços de medicina do trabalho dos serviços públicos ou privados com grupos de trabalhadores vulneráveis para acompanhamento de situação de saúde dos trabalhadores.",
+        "Ativar o canal de denúncias de inconformidades nas recomendações de prevenção."
+      ],
+      atencaoSaude: [
+        "DAS: Manter disponíveis e atualizados os protocolos assistenciais das doenças e agravos ligados ao calor.",
+        "DAS: Promover e manter o aprimoramento dos profissionais para manejar os agravos relacionados ao calor e orientar as medidas de prevenção.",
+        "APS: Monitorar o aumento da demanda por agravos relacionados ao calor extremo.",
+        "APS: Aumentar as visitas domiciliares a idosos, pessoas acamadas, gestantes, crianças e pacientes com doenças crônicas.",
+        "DAES: Revisar os fluxos internos de contingência para eventos climáticos.",
+        "DAES: Identificar e monitorar usuários em maior vulnerabilidade clínica e psicossocial, priorizando aqueles com maior risco de descompensação ou dificuldade de acesso ao serviço.",
+        "DAES: Orientar usuários e familiares sobre medidas de prevenção relacionadas aos eventos climáticos, com ênfase em hidratação, proteção contra exposição ao calor e identificação de sinais de agravamento.",
+        "DAES: Atualizar os contatos dos usuários prioritários e intensificar monitoramento dos territórios de atuação.",
+        "DAES: Verificar as condições de climatização e conforto térmico da unidade.",
+        "SAMU: Monitorar o aumento da demanda e reforçar a preparação das equipes."
+      ],
+      regulacaoComunicacao: [
+        "Central de Leitos: Emitir alerta interno para os núcleos internos de regulação (NIR) dos hospitais ao atingir sensação térmica de até 39°C.",
+        "Central de Leitos: Monitorar o aumento de pedidos de transferência de pacientes nas UPAs e HPSMs com foco em CIDs de eixos distúrbios hidroeletrolíticos, cardiorrespiratório, gastrointestinal e Arboviroses.",
+        "ASCOM: Intensificar campanhas educativas, divulgar boletins e orientações oficiais."
+      ]
+    }
+  },
+  
+  "Severo": {
+    classe: "Severo",
+    tituloNivel: "NÍVEL DE CALOR 3: ALERTA",
+    subtituloEhf: "CLASSIFICAÇÃO DO EHF: SEVERO",
+    rotuloCurto: "NÍVEL 3: ALERTA",
+    corAlerta: "#ea580c",
+    corTexto: "#ffffff",
+    icone: "bi-thermometer-half",
+    statusMs: "CLASSIFICAÇÃO DO EHF: SEVERO",
+    nivelContingencia: "NÍVEL DE CALOR 3: ALERTA",
+    populacao: "Evite o sol das 10h às 16h, procure sombra e beba bastante água.",
+    servicoSaude: "Intensificar a comunicação de risco, orientar pontos de hidratação e priorizar o cuidado a idosos, crianças, gestantes e pessoas com doenças crônicas.",
+    coeBadge: '<span class="badge fs-6 p-2 text-white" style="background-color: #ea580c !important;"><i class="bi bi-exclamation-circle"></i> SALA DE SITUAÇÃO EM ALERTA PRÉVIO</span>',
+    acoesSetores: {
+      cievsVe: [
+        "CIEVS: Ativar monitoramento 24 horas.",
+        "CIEVS: Intensificar alertas epidemiológicos.",
+        "CIEVS: Avaliar necessidade de ativação da sala de situação.",
+        "CIEVS: Emitir comunicação de risco para CIEVS Estadual e Nacional.",
+        "CIEVS: Monitorar a ocorrência de aumento de óbitos, doenças e agravos relacionados à variação do clima.",
+        "Vigilância Epidemiológica: Manter as ações descritas no nível Atenção.",
+        "Vigilância Epidemiológica: Acionamento de equipes de respostas rápidas da Vigilância Epidemiológica.",
+        "Vigilância Epidemiológica: Intensificar o monitoramento dos agravos relacionados aos eventos climáticos extremos.",
+        "NHE: Monitorar excesso de atendimentos e óbitos relacionados ao calor extremo.",
+        "NHE: Garantir a comunicação oportuna por meio da notificação."
+      ],
+      controleEndemias: [
+        "Período da Manhã (07:00 às 10:30): Priorizar exclusivamente tratamento de imóveis positivos, controle de focos em áreas prioritárias, instalação e manutenção de EDL, leitura de ovitrampas, atendimentos decorrentes de denúncias classificadas como prioritárias, inspeção em pontos estratégicos.",
+        "Após as 10:30: Suspender visitas domiciliares de rotina.",
+        "Executar Atividades Internas: Atividades em imóveis especiais, digitação de produção, consolidação de dados, planejamento das equipes, capacitações, educação em saúde em ambientes climatizados e reuniões técnicas.",
+        "Medidas de Proteção: Pausa de 15 minutos por hora, reforço da hidratação, monitoramento contínuo das equipes, encerramento imediato das atividades em caso de mal-estar."
+      ],
+      vigSanitariaAmbiental: [
+        "Vigilância Sanitária: Priorizar inspeções em serviços de saúde, instituições de longa permanência para idosos, serviços de alimentação e eventos de grande porte.",
+        "Vigilância Sanitária: Intensificar a fiscalização da qualidade da água destinada ao consumo humano, fabricação e comercialização de gelo e alimentos perecíveis.",
+        "Vigilância Sanitária: Verificar o funcionamento de sistemas de climatização, abastecimento de água, armazenamento de medicamentos e produtos sujeitos ao controle sanitário.",
+        "Vigilância Sanitária: Emitir orientações e determinar medidas corretivas imediatas para eliminação de riscos sanitários.",
+        "Vigilância Sanitária: Apoiar o CIEVS e o COE com informações provenientes das ações de fiscalização sanitária.",
+        "Vigilância Ambiental: Intensificar inspeções em áreas críticas."
+      ],
+      trabalhador: [
+        "Monitorar a adaptação de carga horária dos grupos de trabalhadores vulneráveis (trabalhadores ao ar livre e expostos ao calor).",
+        "Orientar os grupos de trabalhadores vulneráveis a procurar os serviços de saúde na presença de sinais e sintomas da exposição ao calor excessivo.",
+        "Monitorar diariamente as fichas de notificação relacionadas ao trabalho do SINAN.",
+        "Ativar o canal de denúncias de inconformidades nas recomendações de prevenção."
+      ],
+      atencaoSaude: [
+        "DAS: Reorganizar a rede assistencial e ampliar a capacidade de atendimento, caso necessário.",
+        "APS: Priorizar atendimento a grupos vulneráveis e ampliar o horário de ações estratégicas, evitando ações externas no calor extremo.",
+        "APS: Intensificar vigilância territorial e notificações imediatas.",
+        "DAES: Intensificar o monitoramento e acompanhamento dos usuários em maior vulnerabilidade clínica e psicossocial com risco de descompensação (incluindo busca ativa).",
+        "DAES: Reorganizar as atividades assistenciais e coletivas para ambientes climatizados com conforto térmico, adequando horários.",
+        "DAES: Fortalecer a articulação com a APS, Urgência e Emergência e demais pontos da Rede de Atenção Psicossocial (RAPS).",
+        "DAES: Disponibilizar água potável durante ações externas e ofertar ambiente para hidratação e recuperação térmica.",
+        "DAES: Garantir disponibilização de EPIs aos servidores em atividades externas.",
+        "SAMU: Reforçar equipes e ambulâncias."
+      ],
+      regulacaoComunicacao: [
+        "Central de Leitos: Mapear e reservar 'Leitos de Retaguarda Climática' em parceria com a DAS/DAES para demandas urgentes de desidratação e síncope térmica.",
+        "Central de Leitos: Realizar reuniões extraordinárias de gerenciamento de capacidade com os hospitais para agilizar altas seguras.",
+        "Central de Leitos: Monitorar taxa de ocupação de leitos de retaguarda e giro de leito nas clínicas médica e pediátrica.",
+        "ASCOM: Divulgar alertas oficiais e intensificar a divulgação de medidas de autoproteção à exposição solar.",
+        "ASCOM: Combater a desinformação com transparência."
+      ]
+    }
+  },
+  
+  "Extremo": {
+    classe: "Extremo",
+    tituloNivel: "NÍVEL DE CALOR 4: EMERGÊNCIA",
+    subtituloEhf: "CLASSIFICAÇÃO DO EHF: EXTREMO",
+    rotuloCurto: "NÍVEL 4: EMERGÊNCIA",
+    corAlerta: "#dc2626",
+    corTexto: "#ffffff",
+    icone: "bi-exclamation-triangle-fill",
+    statusMs: "CLASSIFICAÇÃO DO EHF: EXTREMO",
+    nivelContingencia: "NÍVEL DE CALOR 4: EMERGÊNCIA",
+    populacao: "Hidrate-se e, se houver mal-estar, procure o posto de saúde ou ligue 192 (SAMU).",
+    servicoSaude: "Reforçar o atendimento aos grupos vulneráveis e seguir o plano local de enfrentamento ao calor extremo.",
+    coeBadge: '<span class="badge fs-6 p-2 text-white" style="background-color: #dc2626 !important;"><i class="bi bi-radioactive"></i> CENTRO DE OPERAÇÕES DE EMERGÊNCIA (COE) ATIVADO</span>',
+    acoesSetores: {
+      cievsVe: [
+        "CIEVS: Apoiar a ativação do COE.",
+        "CIEVS: Monitorar a ocupação de leitos.",
+        "CIEVS: Realizar a avaliação de risco considerando excesso de demanda de atendimentos e colapso da rede.",
+        "Vigilância Epidemiológica: Ampliar capacidade operacional e priorizar o aumento das equipes de respostas.",
+        "Vigilância Epidemiológica: Intensificar monitoramento da morbidade e mortalidades.",
+        "Vigilância Epidemiológica: Elaborar boletins de informes diários.",
+        "NHE: Apoiar na execução de protocolos internos de Contingenciamento.",
+        "NHE: Monitorar excesso de atendimentos e óbitos relacionados ao calor extremo e garantir a comunicação oportuna por meio da notificação."
+      ],
+      controleEndemias: [
+        "Atividades Externas: Suspensas temporariamente até redução dos níveis de calor.",
+        "Manutenção Apenas das Atividades de ações de Bloqueio em Surtos ou Epidemias, mediante avaliação técnica e de atividades indispensáveis determinadas pela vigilância em saúde.",
+        "Atividades Internas: Digitação da Produção, Georreferenciamento, planejamento operacional, revisão de mapas, elaboração de relatórios, capacitações, educação permanente, preparação de materiais educativos.",
+        "Medidas de Proteção do trabalhador (ACE): Suspensão das atividades ao ar livre durante o período crítico, permanência em ambientes cobertos e ventilados ou climatizados, hidratação permanente, acompanhamento dos servidores com fatores de risco, avaliação contínua da necessidade de manutenção do nível de emergência."
+      ],
+      vigSanitariaAmbiental: [
+        "Vigilância Sanitária: Executar operações extraordinárias de fiscalização nos estabelecimentos considerados críticos e essenciais.",
+        "Vigilância Sanitária: Fiscalizar continuamente hospitais, UPAs, ILPIs, pontos de hidratação, serviços de alimentação, eventos de massa e demais locais com grande concentração de pessoas.",
+        "Vigilância Sanitária: Adotar medidas administrativas previstas na legislação sanitária, incluindo apreensão de produtos impróprios, inutilização de alimentos, interdição cautelar de equipamentos, setores ou estabelecimentos quando constatado risco iminente à saúde.",
+        "Vigilância Sanitária: Monitorar as condições sanitárias do abastecimento de água, alimentos, medicamentos e produtos sujeitos ao controle sanitário durante a emergência.",
+        "Vigilância Sanitária: Integrar as ações do Centro de Operações de Emergência (COE), fornecendo informações técnicas e apoiando as decisões para redução dos riscos sanitários.",
+        "Vigilância Ambiental: Atuar em áreas de calor extremo.",
+        "Vigilância Ambiental: Intensificar ações de saneamento e controle ambiental."
+      ],
+      trabalhador: [
+        "CEREST: Articular a suspensão total de atividades pesadas e exposição solar direta junto a órgãos de fiscalização do trabalho.",
+        "CEREST: Atendimento e acolhimento imediato a trabalhadores acometidos por exaustão ou síncope térmica.",
+        "CEREST: Monitoramento ininterrupto de notificações compulsórias no SINAN de agravos decorrentes de calor."
+      ],
+      atencaoSaude: [
+        "DAS: Garantir funcionamento da rede de atenção à saúde e reorganizar serviços conforme a demanda.",
+        "APS: Manter atendimento prioritário aos grupos vulneráveis e monitoramento intensivo aos pacientes de risco.",
+        "APS: Apoiar ações comunitárias de hidratação e proteção.",
+        "DAES: Garantir a continuidade dos atendimentos essenciais, priorizando usuários em situação de crise, maior vulnerabilidade clínica e psicossocial (com busca ativa).",
+        "DAES: Reorganizar os processos de trabalho e as equipes para assegurar a manutenção da assistência na emergência.",
+        "DAES: Intensificar a articulação com a APS, Urgência e Emergência, Defesa Civil e RAPS.",
+        "DAES: Atuar como ponto de apoio aos usuários ofertando hidratação, ambiente climatizado e higiene pessoal.",
+        "SAMU: Ampliar capacidade operacional, responder rapidamente às urgências e apoiar o transporte de pacientes."
+      ],
+      regulacaoComunicacao: [
+        "Central de Leitos: Ativar o plano de contingência e reserva leitos exclusivos para agravos sensíveis ao clima.",
+        "Central de Leitos: Suspensão temporária de cirurgias eletivas que demandem leitos de UTI/enfermaria pós-operatória.",
+        "Central de Leitos: Atuar conjuntamente ao CISC, CIEVS e COE para gerenciar o risco de colapso da rede e saturação de leitos.",
+        "Central de Leitos: Monitorar percentual de solicitações de leitos de urgência atendidas e taxa de saturação de UTIs.",
+        "ASCOM: Emitir boletins diários e orientar a população sobre medidas de proteção.",
+        "ASCOM: Manter comunicação transparente com a imprensa e sociedade."
+      ]
+    }
+  }
+};
+
+let dadosClimaCache = null;
+let tempoRestante = 600; // 10 minutos em segundos
+
+function normalizarClasse(cls) {
+  if (!cls) return "Sem excesso";
+  const c = cls.trim().toLowerCase();
+  if (c.includes("normal") || c.includes("sem") || c.includes("nenhum")) return "Sem excesso";
+  if (c.includes("baixo") || c.includes("moderado") || c.includes("atenção") || c.includes("atencao")) return "Baixo";
+  if (c.includes("severo") || c.includes("alerta") || c.includes("laranja")) return "Severo";
+  if (c.includes("extremo") || c.includes("emergência") || c.includes("emergencia") || c.includes("vermelho")) return "Extremo";
+  return "Sem excesso";
+}
+
+// Renderiza a interface a partir do JSON de dados
+function renderizarPainel(dados) {
+  dadosClimaCache = dados;
+  const classeHoje = normalizarClasse(dados.hoje.classe);
+  const infoNivel = matrizNiveis[classeHoje] || matrizNiveis["Sem excesso"];
+  
+  // 1. Banner Pulsante
+  const blocoAlerta = document.getElementById("bloco-alerta");
+  if (blocoAlerta) {
+    blocoAlerta.style.backgroundColor = infoNivel.corAlerta;
+    blocoAlerta.style.border = "3px solid rgba(255,255,255,0.7)";
+    blocoAlerta.innerHTML = `
+      <div class="row align-items-center text-white">
+        <div class="col-md-2 text-center">
+          <i class="bi ${infoNivel.icone}" style="font-size: 4.8rem; color: #ffffff !important;"></i>
+        </div>
+        <div class="col-md-7 text-start">
+          <div class="mb-2">
+            <span class="badge badge-alerta-inner px-3 py-1 fw-bold text-uppercase">CIEVS BELÉM · SESMA</span>
+            <span class="badge badge-alerta-inner px-2 py-1 ms-2 fw-normal">DATA: ${dados.hoje.data_br || dados.data_base_br}</span>
+          </div>
+          <h1 class="fw-black m-0 tracking-tight text-white display-6" style="font-weight: 900; letter-spacing: -0.01em;">${infoNivel.tituloNivel}</h1>
+          <div class="mt-2 text-white fw-bold opacity-90" style="font-size: 1.15rem; letter-spacing: 0.03em;">
+            ${infoNivel.subtituloEhf}
+          </div>
+        </div>
+        <div class="col-md-3 text-center border-start border-white-50">
+          <h6 class="text-uppercase opacity-75 mb-1 text-white">Temperatura Prevista</h6>
+          <h2 class="fw-bold mb-0 text-white">${dados.hoje.tmax} °C</h2>
+          <span class="badge badge-alerta-inner mt-2">EHF Diário: ${dados.hoje.ehf}</span>
+        </div>
+      </div>
+    `;
+  }
+  
+  // 2. Quadro O que fazer hoje
+  const quadroOrientacoes = document.getElementById("quadro-orientacoes");
+  if (quadroOrientacoes) {
+    quadroOrientacoes.innerHTML = `
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="p-3 p-md-4 rounded-3 border shadow-sm bg-white h-100" style="border-left: 5px solid #1e3a8a !important;">
+            <div class="d-flex align-items-center mb-3">
+              <i class="bi bi-people-fill fs-3 me-2" style="color: #1e3a8a;"></i>
+              <h5 class="m-0" style="color: #1e3a8a !important; font-weight: 800; font-size: 1.15rem; letter-spacing: 0.04em; word-spacing: 0.15em;">O QUE FAZER HOJE: POPULAÇÃO</h5>
+            </div>
+            <p class="mb-0" style="color: #1e293b !important; font-size: 1.15rem; line-height: 1.6; word-spacing: 0.05em; font-weight: 500;">${infoNivel.populacao}</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="p-3 p-md-4 rounded-3 border shadow-sm bg-white h-100" style="border-left: 5px solid #1e3a8a !important;">
+            <div class="d-flex align-items-center mb-3">
+              <i class="bi bi-hospital fs-3 me-2" style="color: #1e3a8a;"></i>
+              <h5 class="m-0" style="color: #1e3a8a !important; font-weight: 800; font-size: 1.15rem; letter-spacing: 0.04em; word-spacing: 0.15em;">O QUE FAZER HOJE: SERVIÇO DE SAÚDE</h5>
+            </div>
+            <p class="mb-0" style="color: #1e293b !important; font-size: 1.15rem; line-height: 1.6; word-spacing: 0.05em; font-weight: 500;">${infoNivel.servicoSaude}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // 3. Previsão Operacional de Calor (D+0 a D+4)
+  const gradePrevisao = document.getElementById("grade-previsao");
+  if (gradePrevisao && dados.previsoes) {
+    let htmlPrevisoes = '<div class="row row-cols-1 row-cols-md-5 g-2">';
+    dados.previsoes.forEach(prev => {
+      const clsPrev = normalizarClasse(prev.classe);
+      const confPrev = matrizNiveis[clsPrev] || matrizNiveis["Sem excesso"];
+      htmlPrevisoes += `
+        <div class="col text-center">
+          <div class="card h-100 shadow-sm border rounded-3" style="border-top: 6px solid ${confPrev.corAlerta} !important;">
+            <div class="card-body p-3">
+              <h6 class="card-title text-muted fw-bold mb-1">${prev.dia}</h6>
+              <p class="small text-muted mb-2 fw-semibold">${prev.data_br}</p>
+              <h3 class="fw-bold my-2 text-dark">${prev.tmax}°C</h3>
+              <span class="badge badge-dia w-100 py-2 mb-1" style="background-color: ${confPrev.corAlerta}; font-weight: 700;">
+                ${confPrev.rotuloCurto}
+              </span>
+              <p class="mt-1 mb-0 text-muted small fw-semibold" style="font-size: 0.78rem;">${confPrev.subtituloEhf}</p>
+              <p class="mt-1 mb-0 text-muted small">EHF: ${prev.ehf}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    htmlPrevisoes += '</div>';
+    gradePrevisao.innerHTML = htmlPrevisoes;
+  }
+  
+  // 4. Status COE Badge
+  const badgeCoe = document.getElementById("badge-coe-status");
+  if (badgeCoe) {
+    badgeCoe.innerHTML = infoNivel.coeBadge;
+  }
+  
+  // 5. Ações dos Setores de Belém
+  const quadroAcoes = document.getElementById("quadro-acoes-setores");
+  if (quadroAcoes) {
+    const ac = infoNivel.acoesSetores;
+    quadroAcoes.innerHTML = `
+      <div class="row g-3">
+        <!-- 1. CIEVS Belém & Vigilância Epidemiológica -->
+        <div class="col-md-4">
+          <div class="card card-setor p-3 shadow-sm h-100">
+            <h6 class="fw-bold"><i class="bi bi-activity"></i> CIEVS Belém, Vigilância Epidemiológica & NHEs</h6>
+            <p class="small text-muted mb-2">Monitoramento de rumores, avaliação de risco e busca ativa hospitalar</p>
+            <ul class="lista-acoes-integra">
+              ${ac.cievsVe.map(item => `<li>${item}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 2. Controle de Endemias -->
+        <div class="col-md-4">
+          <div class="card card-setor p-3 shadow-sm h-100">
+            <h6 class="fw-bold"><i class="bi bi-bug-fill"></i> Controle de Endemias</h6>
+            <p class="small text-muted mb-2">Horários de campo, rotinas de bloqueio e proteção ocupacional</p>
+            <ul class="lista-acoes-integra">
+              ${ac.controleEndemias.map(item => `<li>${item}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 3. Vigilância Sanitária e Ambiental -->
+        <div class="col-md-4">
+          <div class="card card-setor p-3 shadow-sm h-100">
+            <h6 class="fw-bold"><i class="bi bi-shield-fill-check"></i> Vigilância Sanitária e Ambiental</h6>
+            <p class="small text-muted mb-2">Inspeção de ILPIs, cadeia de frio, água, gelo e medidas cautelares</p>
+            <ul class="lista-acoes-integra">
+              ${ac.vigSanitariaAmbiental.map(item => `<li>${item}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 4. CEREST Saúde do Trabalhador -->
+        <div class="col-md-4">
+          <div class="card card-setor p-3 shadow-sm h-100">
+            <h6 class="fw-bold"><i class="bi bi-person-workspace"></i> CEREST Saúde do Trabalhador</h6>
+            <p class="small text-muted mb-2">Proteção a trabalhadores ao ar livre, EPIs e denúncias</p>
+            <ul class="lista-acoes-integra">
+              ${ac.trabalhador.map(item => `<li>${item}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 5. Atenção à Saúde -->
+        <div class="col-md-4">
+          <div class="card card-setor p-3 shadow-sm h-100">
+            <h6 class="fw-bold"><i class="bi bi-heart-pulse-fill"></i> Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas)</h6>
+            <p class="small text-muted mb-2">Visitas domiciliares, climatização, resfriamento corporal e suporte intensivo</p>
+            <ul class="lista-acoes-integra">
+              ${ac.atencaoSaude.map(item => `<li>${item}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 6. Regulação e Comunicação em Saúde -->
+        <div class="col-md-4">
+          <div class="card card-setor p-3 shadow-sm h-100">
+            <h6 class="fw-bold"><i class="bi bi-hospital"></i> Regulação e Comunicação em Saúde</h6>
+            <p class="small text-muted mb-2">NIR hospitalar, leitos de retaguarda, boletins oficiais e combate a boatos</p>
+            <ul class="lista-acoes-integra">
+              ${ac.regulacaoComunicacao.map(item => `<li>${item}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // 6. Status da Coleta / CRON
+  const painelCron = document.getElementById("painel-status-cron");
+  if (painelCron) {
+    painelCron.innerHTML = `
+      <div class="p-3 bg-light rounded-3 border">
+        <p class="mb-1"><strong>Status da Integração:</strong> <span class="badge bg-success">Conectado / Operante</span></p>
+        <p class="mb-1"><strong>Última Sincronização dos Dados:</strong> ${dados.data_base_br} às ${dados.hora_consulta || '12:00:00'}</p>
+        <p class="mb-1"><strong>Fonte Oficial:</strong> <a href="${dados.fonte_url || 'https://clima.saude.gov.br/pa/belem?data=2026-10-27&modo=ehf'}" target="_blank">clima.saude.gov.br</a> (ECMWF & Ministério da Saúde)</p>
+        <p class="mb-1"><strong>Automação (CRONJOB):</strong> Executada pelo <code>GitHub Actions</code> às 06:00, 12:00 e 18:00 diariamente.</p>
+        <p class="mb-0 text-muted small">O arquivo <code>dados_clima_atual.json</code> é atualizado automaticamente na nuvem sem necessidade de servidores locais ligados.</p>
+      </div>
+    `;
+  }
+
+  // 7. Renderizar Boletim Oficial (Modal / Impressão)
+  renderizarBoletim(dados);
+
+  // 8. Inicializar Mapa Oficial de Belém com Dados do Ministério da Saúde
+  inicializarMapaBelem(dados);
+}
+
+// ==============================================================================
+// MAPA OFICIAL DE VIGILÂNCIA BIOCLIMÁTICA DE BELÉM (MINISTÉRIO DA SAÚDE)
+// ==============================================================================
+let instanciaMapaBelem = null;
+let camadaPoligonoBelem = null;
+let geoJsonMalhaBelemCache = null;
+let dadosPrevisoesAtuais = [];
+let picoHabitualAtual = 34.1;
+
+async function obterMalhaGeoBelem() {
+  if (window.MALHA_BELEM_EMBUTIDA) return window.MALHA_BELEM_EMBUTIDA;
+  if (geoJsonMalhaBelemCache) return geoJsonMalhaBelemCache;
+  try {
+    const r = await fetch('belem_malha.geojson');
+    if (r.ok) {
+      geoJsonMalhaBelemCache = await r.json();
+      return geoJsonMalhaBelemCache;
+    }
+  } catch(e) {}
+  try {
+    const r2 = await fetch('https://servicodados.ibge.gov.br/api/v3/malhas/municipios/1501402?formato=application/vnd.geo+json');
+    if (r2.ok) {
+      geoJsonMalhaBelemCache = await r2.json();
+      return geoJsonMalhaBelemCache;
+    }
+  } catch(e) {}
+  return null;
+}
+
+function gerarPopupMapaBelem(itemPrevisao, corNivel, pico) {
+  return `
+    <div style="min-width: 250px; font-family: system-ui, -apple-system, sans-serif;">
+      <div style="border-bottom: 2px solid ${corNivel}; padding-bottom: 5px; margin-bottom: 8px;">
+        <h6 style="margin: 0; font-weight: 800; color: #1e3a8a; font-size: 1.05rem;">MUNICÍPIO DE BELÉM - PA</h6>
+        <div style="font-size: 0.78rem; color: #64748b; font-weight: 600;">Código IBGE: 1501402 · Ministério da Saúde</div>
+      </div>
+      <div style="background: #f8fafc; border-radius: 8px; padding: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; font-size: 0.85rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+          <span style="color: #475569; font-weight: 600;">Nível de Calor:</span>
+          <span style="font-weight: 800; color: ${corNivel};">${itemPrevisao.titulo_nivel || ''}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+          <span style="color: #64748b;">Classificação EHF:</span>
+          <span style="font-weight: 600; color: #1e293b;">${itemPrevisao.subtitulo_ehf || ''}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+          <span style="color: #64748b;">Fator EHF:</span>
+          <code>${itemPrevisao.ehf}</code>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+          <span style="color: #64748b;">Temp. Máxima:</span>
+          <span style="font-weight: 800; color: #b91c1c; font-size: 1.05rem;">${itemPrevisao.tmax} °C</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+          <span style="color: #64748b;">Temp. Média (24h):</span>
+          <span style="font-weight: 700; color: #0284c7;">${itemPrevisao.tmean || '29.5'} °C</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #64748b;">Pico habitual (P75):</span>
+          <span style="font-weight: 700; color: #dc2626;">${pico} °C</span>
+        </div>
+      </div>
+      <div style="font-size: 0.73rem; color: #94a3b8; text-align: center;">
+        Malha Territorial Oficial IBGE · Vigilância em Saúde (SESMA/MS)
+      </div>
+    </div>
+  `;
+}
+
+window.mudarNivelMapaWeb = function(idx) {
+  if (!dadosPrevisoesAtuais || !dadosPrevisoesAtuais[idx]) return;
+  const p = dadosPrevisoesAtuais[idx];
+  const clsP = normalizarClasse(p.classe);
+  const confP = matrizNiveis[clsP] || matrizNiveis["Sem excesso"];
+  const cor = confP.corAlerta;
+
+  // Atualiza polígono do mapa
+  if (camadaPoligonoBelem) {
+    camadaPoligonoBelem.setStyle({
+      fillColor: cor,
+      color: cor,
+      weight: 3,
+      opacity: 0.95,
+      fillOpacity: 0.55
+    });
+    camadaPoligonoBelem.bindPopup(gerarPopupMapaBelem(p, cor, picoHabitualAtual));
+  }
+
+  // Atualiza indicadores KPI acima do mapa
+  const elEhf = document.getElementById("kpi-mapa-ehf");
+  if (elEhf) elEhf.innerText = p.ehf;
+
+  const elClasse = document.getElementById("kpi-mapa-classe");
+  if (elClasse) {
+    elClasse.innerText = confP.rotuloCurto;
+    elClasse.style.backgroundColor = cor;
+  }
+
+  const elMedia = document.getElementById("kpi-mapa-media");
+  if (elMedia) elMedia.innerText = `${p.tmean || 29.5}°C`;
+
+  const elHoje = document.getElementById("kpi-mapa-hoje");
+  if (elHoje) elHoje.innerText = `${p.tmax}°C`;
+
+  // Atualiza botões
+  for (let i = 0; i < dadosPrevisoesAtuais.length; i++) {
+    const btn = document.getElementById(`btn-web-mapa-dia-${i}`);
+    if (btn) {
+      if (i === idx) {
+        btn.className = "btn btn-sm me-1 mb-1 btn-primary shadow-sm";
+        btn.style.backgroundColor = `${cor} !important`;
+        btn.style.borderColor = `${cor} !important`;
+        btn.style.color = "#ffffff !important";
+      } else {
+        btn.className = "btn btn-sm me-1 mb-1 btn-outline-secondary";
+        btn.style.backgroundColor = "";
+        btn.style.borderColor = "";
+        btn.style.color = "";
+      }
+    }
+  }
+};
+
+async function inicializarMapaBelem(dados) {
+  const containerMapa = document.getElementById("mapa-belem-oficial");
+  if (!containerMapa || typeof L === "undefined") return;
+
+  dadosPrevisoesAtuais = dados.previsoes || [];
+  const classeHoje = normalizarClasse(dados.hoje ? dados.hoje.classe : "Sem excesso");
+  const infoNivel = matrizNiveis[classeHoje] || matrizNiveis["Sem excesso"];
+
+  const ind = dados.indicadores_mapa || {};
+  const ehfVal = (ind.ehf !== undefined) ? ind.ehf : (dados.hoje ? dados.hoje.ehf : 0.0);
+  const mediaVal = (ind.media !== undefined) ? ind.media : 29.5;
+  const hojeVal = (ind.hoje !== undefined) ? ind.hoje : (dados.hoje ? dados.hoje.tmax : 34.8);
+  const picoVal = (ind.pico_habitual !== undefined) ? ind.pico_habitual : 34.1;
+  picoHabitualAtual = picoVal;
+
+  // 1. Atualizar Indicadores Dispostos Acima do Mapa: EHF, Média, Hoje, Pico habitual
+  const elEhf = document.getElementById("kpi-mapa-ehf");
+  if (elEhf) elEhf.innerText = ehfVal;
+
+  const elClasse = document.getElementById("kpi-mapa-classe");
+  if (elClasse) {
+    elClasse.innerText = infoNivel.rotuloCurto;
+    elClasse.style.backgroundColor = infoNivel.corAlerta;
+  }
+
+  const elMedia = document.getElementById("kpi-mapa-media");
+  if (elMedia) elMedia.innerText = `${mediaVal}°C`;
+
+  const elHoje = document.getElementById("kpi-mapa-hoje");
+  if (elHoje) elHoje.innerText = `${hojeVal}°C`;
+
+  const elPico = document.getElementById("kpi-mapa-pico");
+  if (elPico) elPico.innerText = `${picoVal}°C`;
+
+  // 2. Renderizar botões de alternância de projeção no mapa (D+0 a D+4)
+  const barraBotoes = document.getElementById("barra-botoes-dias-mapa");
+  if (barraBotoes && dadosPrevisoesAtuais.length > 0) {
+    let htmlBtns = '<span class="small fw-bold text-muted text-uppercase me-1"><i class="bi bi-sliders"></i> Alternância de Projeção no Mapa:</span>';
+    dadosPrevisoesAtuais.forEach((p, idx) => {
+      const clsP = normalizarClasse(p.classe);
+      const confP = matrizNiveis[clsP] || matrizNiveis["Sem excesso"];
+      const isHoje = (idx === 0);
+      htmlBtns += `
+        <button type="button" id="btn-web-mapa-dia-${idx}" class="btn btn-sm me-1 mb-1 ${isHoje ? 'btn-primary shadow-sm' : 'btn-outline-secondary'}"
+          style="font-size: 0.82rem; font-weight: 600; border-radius: 20px; padding: 4px 12px; ${isHoje ? `background-color: ${confP.corAlerta} !important; border-color: ${confP.corAlerta} !important; color: #ffffff !important;` : ''}"
+          onclick="window.mudarNivelMapaWeb(${idx});">
+          <span style="display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; background-color:${confP.corAlerta};"></span>
+          ${isHoje ? 'Hoje' : 'D+' + idx} (${p.dia}): ${p.tmax}°C
+        </button>
+      `;
+    });
+    barraBotoes.innerHTML = htmlBtns;
+  }
+
+  // 3. Inicialização do Mapa Leaflet
+  if (instanciaMapaBelem) {
+    try { instanciaMapaBelem.remove(); } catch(e) {}
+    instanciaMapaBelem = null;
+  }
+
+  instanciaMapaBelem = L.map('mapa-belem-oficial', {
+    center: [-1.36, -48.46],
+    zoom: 11,
+    scrollWheelZoom: true
+  });
+
+  // Camada Base OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: '&copy; OpenStreetMap contributors | Ministério da Saúde · CIEVS Belém / SESMA · IBGE'
+  }).addTo(instanciaMapaBelem);
+
+  // 4. Carregar malha territorial oficial do IBGE e pintar na cor do nível vigente
+  const geoData = await obterMalhaGeoBelem();
+  if (geoData) {
+    camadaPoligonoBelem = L.geoJSON(geoData, {
+      style: {
+        fillColor: infoNivel.corAlerta,
+        color: infoNivel.corAlerta,
+        weight: 3,
+        opacity: 0.95,
+        fillOpacity: 0.55
+      },
+      onEachFeature: function(feat, layer) {
+        const p0 = (dadosPrevisoesAtuais && dadosPrevisoesAtuais[0]) ? dadosPrevisoesAtuais[0] : { ehf: ehfVal, tmax: hojeVal, tmean: mediaVal, titulo_nivel: infoNivel.titulo, subtitulo_ehf: infoNivel.statusMs };
+        layer.bindPopup(gerarPopupMapaBelem(p0, infoNivel.corAlerta, picoVal));
+        layer.on('mouseover', function(e) {
+          e.target.setStyle({ weight: 4, fillOpacity: 0.7 });
+        });
+        layer.on('mouseout', function(e) {
+          e.target.setStyle({ weight: 3, fillOpacity: 0.55 });
+        });
+      }
+    }).addTo(instanciaMapaBelem);
+
+    try {
+      instanciaMapaBelem.fitBounds(camadaPoligonoBelem.getBounds(), { padding: [15, 15] });
+    } catch(e) {}
+  } else {
+    // Fallback caso a API esteja inacessível
+    L.circle([-1.240717, -48.459911], {
+      color: infoNivel.corAlerta,
+      fillColor: infoNivel.corAlerta,
+      fillOpacity: 0.55,
+      radius: 9500,
+      weight: 3
+    }).addTo(instanciaMapaBelem);
+  }
+
+  // 5. Adicionar Legenda dos 4 Níveis Oficiais
+  const legenda = L.control({ position: 'bottomright' });
+  legenda.onAdd = function() {
+    const div = L.DomUtil.create('div', 'info legend shadow-sm');
+    div.style.background = '#ffffff';
+    div.style.padding = '8px 12px';
+    div.style.borderRadius = '8px';
+    div.style.border = '1px solid #cbd5e1';
+    div.style.fontSize = '12px';
+    div.style.lineHeight = '1.5';
+    div.innerHTML = `
+      <b style="color:#1e3a8a;">Níveis de Calor (EHF/MS)</b><br>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+        <span style="background:#1b5e20;width:14px;height:14px;display:inline-block;border-radius:3px;"></span>
+        <span>Nível 1: Normalidade</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+        <span style="background:#ca8a04;width:14px;height:14px;display:inline-block;border-radius:3px;"></span>
+        <span>Nível 2: Atenção</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+        <span style="background:#ea580c;width:14px;height:14px;display:inline-block;border-radius:3px;"></span>
+        <span>Nível 3: Alerta</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+        <span style="background:#dc2626;width:14px;height:14px;display:inline-block;border-radius:3px;"></span>
+        <span>Nível 4: Emergência</span>
+      </div>
+    `;
+    return div;
+  };
+  legenda.addTo(instanciaMapaBelem);
+
+  setTimeout(() => {
+    if (instanciaMapaBelem) {
+      instanciaMapaBelem.invalidateSize();
+    }
+  }, 250);
+}
+
+// Renderiza o Boletim Oficial: Informe do Clima em Belém
+function renderizarBoletim(dados) {
+  const container = document.getElementById("conteudo-boletim");
+  if (!container) return;
+
+  const classeHoje = normalizarClasse(dados.hoje.classe);
+  const infoNivel = matrizNiveis[classeHoje] || matrizNiveis["Sem excesso"];
+  const ac = infoNivel.acoesSetores;
+
+  const linhasPrevisao = (dados.previsoes || []).map(p => {
+    const cls = normalizarClasse(p.classe);
+    const conf = matrizNiveis[cls] || matrizNiveis["Sem excesso"];
+    return `
+      <tr>
+        <td class="fw-bold">${p.dia}</td>
+        <td>${p.data_br}</td>
+        <td class="fw-bold text-dark fs-6">${p.tmax} °C</td>
+        <td class="text-muted">${p.tmin || 23.0} °C</td>
+        <td>
+          <span class="badge py-2 px-3 fw-bold text-white w-100" style="background-color: ${conf.corAlerta};">
+            ${conf.rotuloCurto}
+          </span>
+        </td>
+        <td class="fw-semibold small">${conf.subtituloEhf}</td>
+        <td><code>${p.ehf}</code></td>
+      </tr>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="boletim-documento bg-white p-3 p-md-4 rounded shadow-sm border">
+      <!-- CABEÇALHO DO BOLETIM -->
+      <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3 flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <img src="logo_sesma.png" alt="SESMA" style="height: 56px; width: auto; object-fit: contain;">
+          <div>
+            <h5 class="fw-bold mb-0 text-dark" style="letter-spacing: 0.02em;">PREFEITURA MUNICIPAL DE BELÉM</h5>
+            <h6 class="fw-bold mb-0 text-primary" style="font-size: 0.95rem;">SECRETARIA MUNICIPAL DE SAÚDE · SESMA</h6>
+            <p class="small text-muted mb-0">Centro de Informações Estratégicas em Vigilância em Saúde · CIEVS Belém</p>
+          </div>
+        </div>
+        <div class="text-end">
+          <span class="badge bg-primary fs-6 px-3 py-2"><i class="bi bi-file-earmark-medical"></i> INFORME DO CLIMA EM BELÉM</span>
+          <p class="small text-muted mt-1 mb-0">Data de Emissão: <strong>${dados.hoje.data_br || dados.data_base_br}</strong> às <strong>${dados.hora_consulta || '12:00:00'}</strong></p>
+        </div>
+      </div>
+
+      <div class="text-center mb-4 pb-2 border-bottom">
+        <h3 class="fw-black text-dark mb-1" style="font-weight: 800; letter-spacing: -0.01em;">BOLETIM OFICIAL: INFORME DO CLIMA EM BELÉM</h3>
+        <p class="text-muted mb-2">Sistema Oficial de Vigilância de Excesso de Calor e Plano de Contingência Local</p>
+        <div class="d-flex justify-content-center gap-3 small text-muted flex-wrap">
+          <span><strong>Município:</strong> Belém - PA (1501402)</span>
+          <span>•</span>
+          <span><strong>Fonte Oficial:</strong> <a href="https://clima.saude.gov.br/pa/belem?data=2026-10-27&modo=ehf" target="_blank" class="text-decoration-none">Ministério da Saúde</a></span>
+          <span>•</span>
+          <span><strong>Metodologia:</strong> EHF (Excess Heat Factor)</span>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 1: NÍVEL DE CALOR DO DIA (ALERTA PISCANTE) -->
+      <div class="mb-4">
+        <h5 class="fw-bold titulo-padrao-escuro mb-2"><i class="bi bi-bell-fill text-danger"></i> 1. NÍVEL DE CALOR DO DIA (VIGÊNCIA HOJE)</h5>
+        <div class="p-4 rounded-3 text-white shadow-sm" style="background-color: ${infoNivel.corAlerta}; border: 2px solid rgba(255,255,255,0.7);">
+          <div class="row align-items-center">
+            <div class="col-md-2 text-center mb-3 mb-md-0">
+              <i class="bi ${infoNivel.icone}" style="font-size: 4rem; color: #ffffff !important;"></i>
+            </div>
+            <div class="col-md-7 text-start">
+              <div class="mb-2">
+                <span class="badge bg-white text-dark px-3 py-1 fw-bold text-uppercase">CIEVS BELÉM · SESMA</span>
+                <span class="badge bg-white text-dark px-2 py-1 ms-2 fw-normal">DATA: ${dados.hoje.data_br || dados.data_base_br}</span>
+              </div>
+              <h2 class="fw-black m-0 text-white" style="font-weight: 900; letter-spacing: 0.02em;">${infoNivel.tituloNivel}</h2>
+              <div class="mt-2 text-white fw-bold opacity-90" style="font-size: 1.15rem; letter-spacing: 0.03em;">
+                ${infoNivel.subtituloEhf}
+              </div>
+            </div>
+            <div class="col-md-3 text-center border-start border-white-50">
+              <div class="small text-uppercase opacity-75 text-white">Temp. Máxima Prevista</div>
+              <h2 class="fw-bold mb-0 text-white">${dados.hoje.tmax} °C</h2>
+              <div class="small opacity-90 text-white mt-1">Mínima: ${dados.hoje.tmin || 23.0} °C</div>
+              <span class="badge bg-black bg-opacity-25 mt-2">EHF Diário: ${dados.hoje.ehf}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-6">
+            <div class="p-3 bg-light rounded border h-100" style="border-left: 4px solid #1e3a8a !important;">
+              <h6 class="fw-bold text-primary mb-1"><i class="bi bi-people-fill"></i> O QUE FAZER HOJE: POPULAÇÃO</h6>
+              <p class="mb-0 text-dark small" style="line-height: 1.5;">${infoNivel.populacao}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 bg-light rounded border h-100" style="border-left: 4px solid #1e3a8a !important;">
+              <h6 class="fw-bold text-primary mb-1"><i class="bi bi-hospital"></i> O QUE FAZER HOJE: SERVIÇOS DE SAÚDE</h6>
+              <p class="mb-0 text-dark small" style="line-height: 1.5;">${infoNivel.servicoSaude}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 2: PREVISÃO OPERACIONAL DE CALOR -->
+      <div class="mb-4">
+        <h5 class="fw-bold titulo-padrao-escuro mb-1"><i class="bi bi-calendar3 text-primary"></i> 2. PREVISÃO OPERACIONAL DE CALOR</h5>
+        <p class="small text-muted mb-2">(D+0 A D+4) — D+0 é a medição/previsão atual; D+1 a D+4 sinalizam a tendência para Belém.</p>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped align-middle text-center mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Referência</th>
+                <th>Data</th>
+                <th>Temp. Máx</th>
+                <th>Temp. Mín</th>
+                <th>Nível de Calor</th>
+                <th>Classificação do EHF</th>
+                <th>Fator EHF</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${linhasPrevisao}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 3: AÇÕES DE RESPOSTA DOS SETORES DE BELÉM (PARA O NÍVEL VIGENTE) -->
+      <div class="mb-4">
+        <h5 class="fw-bold titulo-padrao-escuro mb-1"><i class="bi bi-diagram-3-fill text-primary"></i> 3. AÇÕES DE RESPOSTA DOS SETORES DE BELÉM (PARA O NÍVEL VIGENTE)</h5>
+        <p class="small text-muted mb-3">Protocolos e procedimentos setoriais ativos na rede de saúde para o <strong>${infoNivel.tituloNivel}</strong>:</p>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="card card-setor p-3 shadow-sm h-100">
+              <h6 class="fw-bold"><i class="bi bi-activity"></i> CIEVS Belém, VE & NHEs</h6>
+              <ul class="lista-acoes-integra">
+                ${ac.cievsVe.map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-setor p-3 shadow-sm h-100">
+              <h6 class="fw-bold"><i class="bi bi-bug-fill"></i> Controle de Endemias</h6>
+              <ul class="lista-acoes-integra">
+                ${ac.controleEndemias.map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-setor p-3 shadow-sm h-100">
+              <h6 class="fw-bold"><i class="bi bi-shield-fill-check"></i> Vigilância Sanitária e Ambiental</h6>
+              <ul class="lista-acoes-integra">
+                ${ac.vigSanitariaAmbiental.map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-setor p-3 shadow-sm h-100">
+              <h6 class="fw-bold"><i class="bi bi-person-workspace"></i> CEREST Saúde do Trabalhador</h6>
+              <ul class="lista-acoes-integra">
+                ${ac.trabalhador.map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-setor p-3 shadow-sm h-100">
+              <h6 class="fw-bold"><i class="bi bi-heart-pulse-fill"></i> Atenção à Saúde (APS, Urgência, SAMU)</h6>
+              <ul class="lista-acoes-integra">
+                ${ac.atencaoSaude.map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-setor p-3 shadow-sm h-100">
+              <h6 class="fw-bold"><i class="bi bi-hospital"></i> Regulação e Comunicação em Saúde</h6>
+              <ul class="lista-acoes-integra">
+                ${ac.regulacaoComunicacao.map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RODAPÉ INSTITUCIONAL DO BOLETIM -->
+      <div class="border-top pt-3 mt-4 text-center text-muted small">
+        <p class="mb-1"><strong>Prefeitura Municipal de Belém · Secretaria Municipal de Saúde (SESMA)</strong></p>
+        <p class="mb-1">Centro de Informações Estratégicas em Vigilância em Saúde (CIEVS Belém) · Vigilância de Eventos Climáticos</p>
+        <p class="mb-0">Página oficial do Ministério da Saúde: <a href="https://clima.saude.gov.br/pa/belem?data=2026-10-27&modo=ehf" target="_blank" class="text-decoration-none">https://clima.saude.gov.br/pa/belem?data=2026-10-27&modo=ehf</a></p>
+      </div>
+    </div>
+  `;
+}
+
+function baixarBoletimPDF() {
+  const elemento = document.getElementById("conteudo-boletim");
+  if (!elemento) return;
+
+  const botoesBaixar = document.querySelectorAll(".btn-baixar-pdf");
+  botoesBaixar.forEach(btn => {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Gerando PDF...';
+  });
+
+  const opt = {
+    margin: [8, 8, 8, 8],
+    filename: 'Boletim_Informe_do_Clima_Belem_' + (new Date().toISOString().slice(0, 10)) + '.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  if (typeof html2pdf !== 'undefined') {
+    html2pdf().set(opt).from(elemento).save().then(() => {
+      botoesBaixar.forEach(btn => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill me-1"></i> Baixar Arquivo em PDF';
+      });
+    }).catch(err => {
+      console.warn("Falha no html2pdf, abrindo caixa de impressão para salvar em PDF:", err);
+      window.print();
+      botoesBaixar.forEach(btn => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill me-1"></i> Baixar Arquivo em PDF';
+      });
+    });
+  } else {
+    window.print();
+    botoesBaixar.forEach(btn => {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill me-1"></i> Baixar Arquivo em PDF';
+    });
+  }
+}
+
+function imprimirBoletim() {
+  window.print();
+}
+
+// Carrega os dados climáticos atuais
+function carregarDadosClima() {
+  fetch('dados_clima_atual.json?t=' + Date.now())
+    .then(response => {
+      if (!response.ok) throw new Error("Status " + response.status);
+      return response.json();
+    })
+    .then(dados => {
+      renderizarPainel(dados);
+    })
+    .catch(err => {
+      console.warn("Carregando dados oficiais embutidos:", err);
+      if (window.DADOS_CLIMA_EMBUTIDOS) {
+        renderizarPainel(window.DADOS_CLIMA_EMBUTIDOS);
+        return;
+      }
+      // Fallback local se o fetch falhar
+      const fallback = {
+        municipio: "Belém - PA",
+        data_base_br: new Date().toLocaleDateString('pt-BR'),
+        hora_consulta: new Date().toLocaleTimeString('pt-BR'),
+        hoje: { dia: "Hoje", data_br: new Date().toLocaleDateString('pt-BR'), classe: "Sem excesso", ehf: 0, tmax: 33.9, tmin: 23.7 },
+        previsoes: [
+          { dia: "Hoje", data_br: new Date().toLocaleDateString('pt-BR'), classe: "Sem excesso", ehf: 0, tmax: 33.9 },
+          { dia: "D+1", data_br: "+1 dia", classe: "Sem excesso", ehf: 0, tmax: 34.4 },
+          { dia: "D+2", data_br: "+2 dias", classe: "Sem excesso", ehf: 0, tmax: 36.1 },
+          { dia: "D+3", data_br: "+3 dias", classe: "Sem excesso", ehf: 0.21, tmax: 34.9 },
+          { dia: "D+4", data_br: "+4 dias", classe: "Sem excesso", ehf: 0.2, tmax: 34.8 }
+        ]
+      };
+      renderizarPainel(fallback);
+    });
+}
+
+// Contador regressivo para rechecagem no navegador
+function iniciarCronometro() {
+  const el = document.getElementById('cronometro-regressivo');
+  setInterval(() => {
+    tempoRestante--;
+    if (tempoRestante < 0) {
+      tempoRestante = 600;
+      carregarDadosClima();
+    }
+    if (el) {
+      const min = Math.floor(tempoRestante / 60);
+      const seg = tempoRestante % 60;
+      el.innerText = (min < 10 ? '0' + min : min) + ':' + (seg < 10 ? '0' + seg : seg);
+    }
+  }, 1000);
+}
+
+// Inicialização do painel no carregamento do DOM
+document.addEventListener("DOMContentLoaded", () => {
+  carregarDadosClima();
+  iniciarCronometro();
+});
+
+</script>
+</body>
+</html>
