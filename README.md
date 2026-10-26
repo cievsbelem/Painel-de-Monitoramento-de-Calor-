@@ -1,0 +1,1 @@
+# Painel-de-Monitoramento-de-Calor-
