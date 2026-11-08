@@ -1,0 +1,68 @@
+name: "CRONJOB & Deploy GitHub Pages - Clima Belém"
+
+on:
+  schedule:
+    # Executa diariamente às 06:00, 12:00 e 18:00 (Horário de Belém / UTC-3 -> 09:00, 15:00, 21:00 UTC)
+    - cron: '0 9,15,21 * * *'
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  coletar_e_publicar:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Executar Coletor de Dados EHF
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          DESTINATARIOS_SECRET: ${{ secrets.DESTINATARIOS_SECRET }}
+        run: |
+          python coletor_clima.py
+
+      - name: Commitar JSON, Histórico e Malha Atualizados
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add dados_clima_atual.json historico_ehf.csv belem_malha.geojson painel_calor_belem.html
+          if ! git diff --staged --quiet; then
+            git commit -m "Auto-update dados climáticos e malha EHF [skip ci]"
+            git push
+          fi
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Fazer Upload do Artefato
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
