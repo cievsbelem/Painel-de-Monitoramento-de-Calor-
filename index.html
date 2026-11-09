@@ -300,20 +300,62 @@
       border: 1px solid rgba(0, 0, 0, 0.25) !important;
     }
 
-    /* ESTILOS DO BOLETIM E ESTRUTURA ANTI-CORTE */
+    /* ESTILOS DO BOLETIM E ESTRUTURA ANTI-SOBREPOSIÇÃO */
     .card-setor-boletim {
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      background-color: #ffffff;
+      border: 1px solid #cbd5e1 !important;
+      border-radius: 6px !important;
+      background-color: #ffffff !important;
+      padding: 6px 8px !important;
+      height: auto !important;
+      min-height: auto !important;
+      overflow: visible !important;
+      box-sizing: border-box !important;
     }
     .lista-acoes-boletim {
-      padding-left: 14px;
-      font-size: 0.72rem;
-      line-height: 1.36;
-      color: #334155;
+      padding-left: 14px !important;
+      margin-bottom: 0 !important;
+      font-size: 0.68rem !important;
+      line-height: 1.28 !important;
+      color: #334155 !important;
     }
     .lista-acoes-boletim li {
-      margin-bottom: 3px;
+      margin-bottom: 2px !important;
+    }
+    .grade-setores-boletim {
+      width: 100% !important;
+      display: block !important;
+      clear: both !important;
+    }
+    .linha-setores-boletim {
+      width: 100% !important;
+      display: block !important;
+      clear: both !important;
+      margin-bottom: 8px !important;
+    }
+    .col-setor-esquerda {
+      width: 49% !important;
+      float: left !important;
+      box-sizing: border-box !important;
+    }
+    .col-setor-direita {
+      width: 49% !important;
+      float: right !important;
+      box-sizing: border-box !important;
+    }
+    .clearfix-boletim {
+      clear: both !important;
+      height: 0 !important;
+      line-height: 0 !important;
+      visibility: hidden !important;
+    }
+    .boletim-rodape {
+      clear: both !important;
+      display: block !important;
+      width: 100% !important;
+      margin-top: 14px !important;
+      padding-top: 6px !important;
+      border-top: 1px solid #cbd5e1 !important;
+      position: static !important;
     }
     .html2pdf__page-break {
       page-break-before: always !important;
@@ -335,9 +377,9 @@
 
     /* MODO OTIMIZADO PARA GERAÇÃO AUTOMÁTICA DE PDF EM A4 */
     .boletim-modo-pdf {
-      width: 780px !important;
-      max-width: 780px !important;
-      margin: 0 !important;
+      width: 760px !important;
+      max-width: 760px !important;
+      margin: 0 auto !important;
       padding: 6px !important;
       background: #ffffff !important;
       box-sizing: border-box !important;
@@ -348,7 +390,9 @@
       padding: 0 !important;
     }
     .boletim-modo-pdf .card-setor-boletim {
-      margin-bottom: 6px !important;
+      margin-bottom: 0 !important;
+      height: auto !important;
+      min-height: auto !important;
       break-inside: avoid !important;
       page-break-inside: avoid !important;
     }
@@ -362,7 +406,7 @@
       padding: 2px 5px !important;
     }
 
-    /* FORMATAÇÃO DIRETA PARA IMPRESSÃO A4 (ANTI-PÁGINA EM BRANCO) */
+    /* FORMATAÇÃO DIRETA PARA IMPRESSÃO A4 (ANTI-SOBREPOSIÇÃO E ANTI-PÁGINA EM BRANCO) */
     @media print {
       @page {
         size: A4 portrait;
@@ -416,12 +460,63 @@
         padding: 0 !important;
         border: none !important;
       }
-      .card-setor-boletim,
-      .card,
-      tr,
-      .table,
-      .alerta-box,
-      .evitar-quebra {
+      .grade-setores-boletim {
+        display: block !important;
+        width: 100% !important;
+        clear: both !important;
+      }
+      .linha-setores-boletim {
+        display: block !important;
+        width: 100% !important;
+        clear: both !important;
+        margin-bottom: 8px !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .col-setor-esquerda {
+        width: 49% !important;
+        float: left !important;
+        box-sizing: border-box !important;
+      }
+      .col-setor-direita {
+        width: 49% !important;
+        float: right !important;
+        box-sizing: border-box !important;
+      }
+      .clearfix-boletim {
+        clear: both !important;
+        height: 0 !important;
+        line-height: 0 !important;
+      }
+      .card-setor-boletim {
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 6px !important;
+        background-color: #ffffff !important;
+        padding: 6px 8px !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .lista-acoes-boletim {
+        padding-left: 14px !important;
+        margin-bottom: 0 !important;
+        font-size: 0.68rem !important;
+        line-height: 1.28 !important;
+        color: #334155 !important;
+      }
+      .lista-acoes-boletim li {
+        margin-bottom: 2px !important;
+      }
+      .boletim-rodape {
+        clear: both !important;
+        display: block !important;
+        width: 100% !important;
+        margin-top: 14px !important;
+        padding-top: 6px !important;
+        border-top: 1px solid #cbd5e1 !important;
+        position: static !important;
         break-inside: avoid !important;
         page-break-inside: avoid !important;
       }

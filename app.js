@@ -868,15 +868,15 @@ function renderizarBoletim(dados) {
           <!-- RECOMENDAÇÕES DA POPULAÇÃO E SERVIÇOS DE SAÚDE -->
           <div class="row g-2 mt-1">
             <div class="col-6">
-              <div class="p-2 bg-light rounded border h-100" style="border-left: 3px solid #1e3a8a !important;">
+              <div class="p-2 bg-light rounded border" style="border-left: 3px solid #1e3a8a !important; height: auto;">
                 <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-people-fill me-1"></i> O QUE FAZER HOJE: POPULAÇÃO</h6>
-                <p class="mb-0 text-dark" style="font-size: 0.75rem; line-height: 1.35;">${infoNivel.populacao}</p>
+                <p class="mb-0 text-dark" style="font-size: 0.74rem; line-height: 1.32;">${infoNivel.populacao}</p>
               </div>
             </div>
             <div class="col-6">
-              <div class="p-2 bg-light rounded border h-100" style="border-left: 3px solid #1e3a8a !important;">
+              <div class="p-2 bg-light rounded border" style="border-left: 3px solid #1e3a8a !important; height: auto;">
                 <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-hospital me-1"></i> O QUE FAZER HOJE: SERVIÇOS DE SAÚDE</h6>
-                <p class="mb-0 text-dark" style="font-size: 0.75rem; line-height: 1.35;">${infoNivel.servicoSaude}</p>
+                <p class="mb-0 text-dark" style="font-size: 0.74rem; line-height: 1.32;">${infoNivel.servicoSaude}</p>
               </div>
             </div>
           </div>
@@ -926,72 +926,77 @@ function renderizarBoletim(dados) {
           <h6 class="fw-bold titulo-padrao-escuro mb-1" style="font-size: 0.90rem;"><i class="bi bi-diagram-3-fill text-primary me-1"></i> 3. AÇÕES DE RESPOSTA DOS SETORES DE BELÉM (PARA O NÍVEL VIGENTE)</h6>
           <p class="text-muted mb-2" style="font-size: 0.72rem;">Protocolos setoriais e procedimentos operacionais ativos na rede municipal para o <strong>${infoNivel.tituloNivel}</strong>:</p>
 
-          <!-- GRADE DE 2 COLUNAS (LARGURA AMPLA IDEAL PARA A4) -->
-          <div class="row g-2">
-            <!-- 1. CIEVS Belém, VE & NHEs -->
-            <div class="col-6">
-              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
-                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-activity me-1"></i> 1. CIEVS Belém, VE & NHEs</h6>
-                <ul class="lista-acoes-boletim mb-0">
-                  ${ac.cievsVe.map(item => `<li>${item}</li>`).join('')}
-                </ul>
+          <!-- GRADE DE SETORES DO BOLETIM (ESTRUTURA ANTI-SOBREPOSIÇÃO) -->
+          <div class="grade-setores-boletim">
+            
+            <!-- LINHA 1: Setores 1 e 2 -->
+            <div class="linha-setores-boletim">
+              <div class="col-setor-esquerda">
+                <div class="card-setor-boletim p-2" style="border-left: 3px solid #1e3a8a;">
+                  <h6 class="fw-bold text-primary mb-1" style="font-size: 0.76rem;"><i class="bi bi-activity me-1"></i> 1. CIEVS Belém, VE & NHEs</h6>
+                  <ul class="lista-acoes-boletim mb-0">
+                    ${ac.cievsVe.map(item => `<li>${item}</li>`).join('')}
+                  </ul>
+                </div>
               </div>
+              <div class="col-setor-direita">
+                <div class="card-setor-boletim p-2" style="border-left: 3px solid #1e3a8a;">
+                  <h6 class="fw-bold text-primary mb-1" style="font-size: 0.76rem;"><i class="bi bi-bug-fill me-1"></i> 2. Controle de Endemias (DVS)</h6>
+                  <ul class="lista-acoes-boletim mb-0">
+                    ${ac.controleEndemias.map(item => `<li>${item}</li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+              <div class="clearfix-boletim"></div>
             </div>
 
-            <!-- 2. Controle de Endemias -->
-            <div class="col-6">
-              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
-                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-bug-fill me-1"></i> 2. Controle de Endemias (DVS)</h6>
-                <ul class="lista-acoes-boletim mb-0">
-                  ${ac.controleEndemias.map(item => `<li>${item}</li>`).join('')}
-                </ul>
+            <!-- LINHA 2: Setores 3 e 4 -->
+            <div class="linha-setores-boletim">
+              <div class="col-setor-esquerda">
+                <div class="card-setor-boletim p-2" style="border-left: 3px solid #1e3a8a;">
+                  <h6 class="fw-bold text-primary mb-1" style="font-size: 0.76rem;"><i class="bi bi-shield-fill-check me-1"></i> 3. Vigilância Sanitária e Ambiental</h6>
+                  <ul class="lista-acoes-boletim mb-0">
+                    ${ac.vigSanitariaAmbiental.map(item => `<li>${item}</li>`).join('')}
+                  </ul>
+                </div>
               </div>
+              <div class="col-setor-direita">
+                <div class="card-setor-boletim p-2" style="border-left: 3px solid #1e3a8a;">
+                  <h6 class="fw-bold text-primary mb-1" style="font-size: 0.76rem;"><i class="bi bi-person-workspace me-1"></i> 4. CEREST Saúde do Trabalhador</h6>
+                  <ul class="lista-acoes-boletim mb-0">
+                    ${ac.trabalhador.map(item => `<li>${item}</li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+              <div class="clearfix-boletim"></div>
             </div>
 
-            <!-- 3. Vigilância Sanitária e Ambiental -->
-            <div class="col-6">
-              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
-                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-shield-fill-check me-1"></i> 3. Vigilância Sanitária e Ambiental</h6>
-                <ul class="lista-acoes-boletim mb-0">
-                  ${ac.vigSanitariaAmbiental.map(item => `<li>${item}</li>`).join('')}
-                </ul>
+            <!-- LINHA 3: Setores 5 e 6 -->
+            <div class="linha-setores-boletim">
+              <div class="col-setor-esquerda">
+                <div class="card-setor-boletim p-2" style="border-left: 3px solid #1e3a8a;">
+                  <h6 class="fw-bold text-primary mb-1" style="font-size: 0.76rem;"><i class="bi bi-heart-pulse-fill me-1"></i> 5. Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas especializadas)</h6>
+                  <ul class="lista-acoes-boletim mb-0">
+                    ${ac.atencaoSaude.map(item => `<li>${item}</li>`).join('')}
+                  </ul>
+                </div>
               </div>
+              <div class="col-setor-direita">
+                <div class="card-setor-boletim p-2" style="border-left: 3px solid #1e3a8a;">
+                  <h6 class="fw-bold text-primary mb-1" style="font-size: 0.76rem;"><i class="bi bi-hospital me-1"></i> 6. Regulação & Comunicação (Central de Leitos / ASCOM)</h6>
+                  <ul class="lista-acoes-boletim mb-0">
+                    ${ac.regulacaoComunicacao.map(item => `<li>${item}</li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+              <div class="clearfix-boletim"></div>
             </div>
 
-            <!-- 4. CEREST Saúde do Trabalhador -->
-            <div class="col-6">
-              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
-                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-person-workspace me-1"></i> 4. CEREST Saúde do Trabalhador</h6>
-                <ul class="lista-acoes-boletim mb-0">
-                  ${ac.trabalhador.map(item => `<li>${item}</li>`).join('')}
-                </ul>
-              </div>
-            </div>
-
-            <!-- 5. Atenção à Saúde -->
-            <div class="col-6">
-              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
-                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-heart-pulse-fill me-1"></i> 5. Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas especializadas)</h6>
-                <ul class="lista-acoes-boletim mb-0">
-                  ${ac.atencaoSaude.map(item => `<li>${item}</li>`).join('')}
-                </ul>
-              </div>
-            </div>
-
-            <!-- 6. Regulação e Comunicação em Saúde -->
-            <div class="col-6">
-              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
-                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-hospital me-1"></i> 6. Regulação & Comunicação (Central de Leitos / ASCOM)</h6>
-                <ul class="lista-acoes-boletim mb-0">
-                  ${ac.regulacaoComunicacao.map(item => `<li>${item}</li>`).join('')}
-                </ul>
-              </div>
-            </div>
           </div>
         </div>
 
-        <!-- RODAPÉ INSTITUCIONAL DO BOLETIM -->
-        <div class="border-top pt-2 mt-3 text-center text-muted evitar-quebra" style="font-size: 0.68rem;">
+        <!-- RODAPÉ INSTITUCIONAL DO BOLETIM (COM CLEARFIX GARANTIDO) -->
+        <div class="boletim-rodape text-center text-muted" style="font-size: 0.68rem;">
           <p class="mb-0 fw-bold">Prefeitura Municipal de Belém · Secretaria Municipal de Saúde (SESMA)</p>
           <p class="mb-0">Centro de Informações Estratégicas em Vigilância em Saúde (CIEVS Belém) · Vigilância de Eventos Climáticos</p>
           <p class="mb-0">Página oficial: <a href="https://clima.saude.gov.br/pa/belem?modo=ehf" target="_blank" class="text-decoration-none">clima.saude.gov.br</a> (ECMWF & Ministério da Saúde)</p>
@@ -1003,8 +1008,9 @@ function renderizarBoletim(dados) {
 }
 
 function baixarBoletimPDF() {
-  const elemento = document.getElementById("conteudo-boletim");
-  if (!elemento) return;
+  const modalBody = document.getElementById("conteudo-boletim");
+  if (!modalBody) return;
+  const elemento = modalBody.querySelector(".boletim-documento") || modalBody;
 
   const botoesBaixar = document.querySelectorAll(".btn-baixar-pdf");
   botoesBaixar.forEach(btn => {
@@ -1012,32 +1018,23 @@ function baixarBoletimPDF() {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Gerando PDF A4...';
   });
 
-  // Salva posições de rolagem da tela
-  const scrollOrigX = window.scrollX || window.pageXOffset || 0;
-  const scrollOrigY = window.scrollY || window.pageYOffset || 0;
-
-  // Cria um container isolado diretamente na raiz do body
-  // Elimina interferências de modais Bootstrap (position:fixed, scrollbars, transforms e z-index)
-  const tempDiv = document.createElement("div");
-  tempDiv.id = "boletim-render-pdf";
-  tempDiv.className = "boletim-modo-pdf";
-  tempDiv.style.width = "780px";
-  tempDiv.style.maxWidth = "780px";
-  tempDiv.style.position = "absolute";
-  tempDiv.style.left = "0";
-  tempDiv.style.top = "0";
-  tempDiv.style.zIndex = "9999999";
-  tempDiv.style.backgroundColor = "#ffffff";
-  tempDiv.style.margin = "0";
-  tempDiv.style.padding = "6px";
-  tempDiv.style.boxSizing = "border-box";
-  tempDiv.innerHTML = elemento.innerHTML;
-  document.body.appendChild(tempDiv);
-
-  // Rola para o topo para garantir snapshot no offset exato (0, 0)
-  window.scrollTo(0, 0);
-
   const dataAtual = dadosClimaCache?.data_base_iso || (new Date().toISOString().slice(0, 10));
+
+  // Clona o documento para garantir isolamento e largura exata de página A4
+  const clone = elemento.cloneNode(true);
+  clone.id = "boletim-render-clone";
+  clone.classList.add("boletim-modo-pdf");
+  clone.style.width = "760px";
+  clone.style.maxWidth = "760px";
+  clone.style.margin = "0 auto";
+  clone.style.padding = "6px";
+  clone.style.backgroundColor = "#ffffff";
+  clone.style.color = "#1e293b";
+  clone.style.position = "static";
+  clone.style.display = "block";
+  clone.style.height = "auto";
+  clone.style.overflow = "visible";
+
   const opt = {
     margin: [6, 6, 6, 6],
     filename: 'Boletim_Oficial_Calor_Belem_' + dataAtual + '.pdf',
@@ -1046,23 +1043,17 @@ function baixarBoletimPDF() {
       scale: 2, 
       useCORS: true, 
       logging: false,
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: 800
+      backgroundColor: '#ffffff'
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak: { 
       mode: ['css', 'legacy'],
       before: '.html2pdf__page-break',
-      avoid: ['.evitar-quebra', '.card-setor-boletim', '.card', 'tr', '.table-responsive']
+      avoid: ['.evitar-quebra', '.card-setor-boletim', '.linha-setores-boletim', '.card', 'tr', '.table-responsive']
     }
   };
 
   const restaurar = () => {
-    if (tempDiv && tempDiv.parentNode) {
-      tempDiv.parentNode.removeChild(tempDiv);
-    }
-    window.scrollTo(scrollOrigX, scrollOrigY);
     botoesBaixar.forEach(btn => {
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill me-1"></i> Baixar Arquivo em PDF';
@@ -1071,14 +1062,14 @@ function baixarBoletimPDF() {
 
   if (typeof html2pdf !== 'undefined') {
     setTimeout(() => {
-      html2pdf().set(opt).from(tempDiv).save().then(() => {
+      html2pdf().set(opt).from(clone).save().then(() => {
         restaurar();
       }).catch(err => {
-        console.warn("Falha no html2pdf, acionando impressão nativa anti-corte:", err);
+        console.warn("Falha no html2pdf:", err);
         restaurar();
         imprimirBoletim();
       });
-    }, 200);
+    }, 250);
   } else {
     restaurar();
     imprimirBoletim();
@@ -1086,29 +1077,32 @@ function baixarBoletimPDF() {
 }
 
 function imprimirBoletim() {
-  const elemento = document.getElementById("conteudo-boletim");
-  if (!elemento) return;
+  const modalBody = document.getElementById("conteudo-boletim");
+  if (!modalBody) return;
+  const elemento = modalBody.querySelector(".boletim-documento") || modalBody;
+
   let area = document.getElementById("area-impressao-boletim");
   if (!area) {
     area = document.createElement("div");
     area.id = "area-impressao-boletim";
     document.body.prepend(area);
   }
-  area.innerHTML = elemento.innerHTML;
+  area.innerHTML = elemento.outerHTML;
   window.print();
 }
 
 // Suporte para Ctrl+P direto no navegador quando o modal estiver aberto
 window.addEventListener("beforeprint", () => {
-  const elemento = document.getElementById("conteudo-boletim");
-  if (!elemento) return;
+  const modalBody = document.getElementById("conteudo-boletim");
+  if (!modalBody) return;
+  const elemento = modalBody.querySelector(".boletim-documento") || modalBody;
   let area = document.getElementById("area-impressao-boletim");
   if (!area) {
     area = document.createElement("div");
     area.id = "area-impressao-boletim";
     document.body.prepend(area);
   }
-  area.innerHTML = elemento.innerHTML;
+  area.innerHTML = elemento.outerHTML;
 });
 
 window.addEventListener("afterprint", () => {
