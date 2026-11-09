@@ -113,7 +113,7 @@ matriz_niveis <- list(
     titulo_nivel = "NÍVEL DE CALOR 2: ATENÇÃO",
     subtitulo_ehf = "CLASSIFICAÇÃO DO EHF: BAIXO",
     rotulo_curto = "NÍVEL 2: ATENÇÃO",
-    cor_alerta = "#ca8a04",
+    cor_alerta = "#ffc107",
     cor_texto = "#ffffff",
     icone = "exclamation-circle-fill",
     status_ms = "CLASSIFICAÇÃO DO EHF: BAIXO",
@@ -715,7 +715,7 @@ server <- function(input, output, session) {
       "David Aurélio Vale do Rosário (RT)",
       "Suellen Gomes Soares (RT)",
       "Luan Auad Beltrão Pereira (Coord. eMulti)",
-      "Mozer da Costa Farias (Casas Especializadas)",
+      "Mozer da Costa Farias (Casas especializadas)",
       "Cláudia Porto (Coordenação CEREST)",
       "Paulo Gomes (Diretor DEVISA)",
       "Jones Ribeiro (Coord. Regulação)",
@@ -734,8 +734,8 @@ server <- function(input, output, session) {
     Setor = c(
       "CIEVS Belém & Vigilância Epidemiológica",
       "CIEVS Belém & Vigilância Epidemiológica",
-      "Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas Especializadas)",
-      "Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas Especializadas)",
+      "Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas especializadas)",
+      "Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas especializadas)",
       "CEREST Saúde do Trabalhador",
       "Vigilância Sanitária e Ambiental",
       "Regulação e Comunicação em Saúde",
@@ -1338,7 +1338,7 @@ server <- function(input, output, session) {
       # 5. ATENÇÃO À SAÚDE UNIFICADA (APS + URGÊNCIA/EMERGÊNCIA/SAMU/CASAS ESPECIALIZADAS)
       card(
         class = "card-setor p-3 shadow-sm",
-        h6(class = "fw-bold", bs_icon("heart-pulse-fill"), " Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas Especializadas)"),
+        h6(class = "fw-bold", bs_icon("heart-pulse-fill"), " Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas especializadas)"),
         p(class = "small text-muted mb-2", "Visitas domiciliares, climatização, resfriamento corporal e suporte intensivo"),
         tags$ul(class = "lista-acoes-integra", lapply(acoes$atencao_saude_unificada, tags$li))
       ),
@@ -1530,7 +1530,7 @@ server <- function(input, output, session) {
             
             var mapaCores = {
               'Sem excesso': { cor: '#1b5e20', titulo: 'NÍVEL DE CALOR 1: NORMALIDADE', sub: 'CLASSIFICAÇÃO DO EHF: SEM EXCESSO DE CALOR', rotulo: 'NÍVEL 1: NORMALIDADE' },
-              'Baixo': { cor: '#ca8a04', titulo: 'NÍVEL DE CALOR 2: ATENÇÃO', sub: 'CLASSIFICAÇÃO DO EHF: BAIXO', rotulo: 'NÍVEL 2: ATENÇÃO' },
+              'Baixo': { cor: '#ffc107', titulo: 'NÍVEL DE CALOR 2: ATENÇÃO', sub: 'CLASSIFICAÇÃO DO EHF: BAIXO', rotulo: 'NÍVEL 2: ATENÇÃO' },
               'Severo': { cor: '#ea580c', titulo: 'NÍVEL DE CALOR 3: ALERTA', sub: 'CLASSIFICAÇÃO DO EHF: SEVERO', rotulo: 'NÍVEL 3: ALERTA' },
               'Extremo': { cor: '#dc2626', titulo: 'NÍVEL DE CALOR 4: EMERGÊNCIA', sub: 'CLASSIFICAÇÃO DO EHF: EXTREMO', rotulo: 'NÍVEL 4: EMERGÊNCIA' }
             };
@@ -1726,7 +1726,7 @@ server <- function(input, output, session) {
                     '<span>Nível 1: Normalidade</span>' +
                   '</div>' +
                   '<div style=\"display:flex;align-items:center;gap:6px;margin-top:2px;\">' +
-                    '<span style=\"background:#ca8a04;width:14px;height:14px;display:inline-block;border-radius:3px;\"></span>' +
+                    '<span style=\"background:#ffc107;width:14px;height:14px;display:inline-block;border-radius:3px;\"></span>' +
                     '<span>Nível 2: Atenção</span>' +
                   '</div>' +
                   '<div style=\"display:flex;align-items:center;gap:6px;margin-top:2px;\">' +

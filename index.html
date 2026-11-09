@@ -66,6 +66,59 @@
       border: 1px solid rgba(255, 255, 255, 0.4) !important;
     }
     
+    
+    /* TEMA ESCURO DO ALERTA (NÍVEL 2 - AMARELO #ffc107) */
+    .alerta-tema-escuro,
+    .alerta-tema-escuro h1,
+    .alerta-tema-escuro h2,
+    .alerta-tema-escuro h5,
+    .alerta-tema-escuro h6,
+    .alerta-tema-escuro p,
+    .alerta-tema-escuro span,
+    .alerta-tema-escuro i,
+    .alerta-tema-escuro div {
+      color: #1e293b !important;
+    }
+    .badge-alerta-inner-dark {
+      background-color: rgba(0, 0, 0, 0.08) !important;
+      color: #1e293b !important;
+      border: 1px solid rgba(0, 0, 0, 0.25) !important;
+    }
+
+    /* PREVENÇÃO DE CORTES NO BOLETIM E IMPRESSÃO / PDF */
+    .evitar-quebra,
+    .card-setor,
+    .card,
+    tr,
+    .table-responsive {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+
+    /* MODO OTIMIZADO PARA GERAÇÃO AUTOMÁTICA DE PDF */
+    .boletim-modo-pdf {
+      width: 790px !important;
+      max-width: 790px !important;
+      margin: 0 auto !important;
+      padding: 10px !important;
+      background: #ffffff !important;
+      box-sizing: border-box !important;
+    }
+    .boletim-modo-pdf .card-setor {
+      margin-bottom: 12px !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+    .boletim-modo-pdf .table th, 
+    .boletim-modo-pdf .table td {
+      padding: 5px 6px !important;
+      font-size: 0.85rem !important;
+    }
+    .boletim-modo-pdf .lista-acoes-integra {
+      font-size: 0.82rem !important;
+      line-height: 1.4 !important;
+    }
+
     .card-setor {
       border-left: 5px solid #1e3a8a;
       background-color: #ffffff;
@@ -271,7 +324,60 @@
         box-shadow: none !important;
         padding: 0 !important;
       }
-      .card-setor {
+      
+    /* TEMA ESCURO DO ALERTA (NÍVEL 2 - AMARELO #ffc107) */
+    .alerta-tema-escuro,
+    .alerta-tema-escuro h1,
+    .alerta-tema-escuro h2,
+    .alerta-tema-escuro h5,
+    .alerta-tema-escuro h6,
+    .alerta-tema-escuro p,
+    .alerta-tema-escuro span,
+    .alerta-tema-escuro i,
+    .alerta-tema-escuro div {
+      color: #1e293b !important;
+    }
+    .badge-alerta-inner-dark {
+      background-color: rgba(0, 0, 0, 0.08) !important;
+      color: #1e293b !important;
+      border: 1px solid rgba(0, 0, 0, 0.25) !important;
+    }
+
+    /* PREVENÇÃO DE CORTES NO BOLETIM E IMPRESSÃO / PDF */
+    .evitar-quebra,
+    .card-setor,
+    .card,
+    tr,
+    .table-responsive {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+
+    /* MODO OTIMIZADO PARA GERAÇÃO AUTOMÁTICA DE PDF */
+    .boletim-modo-pdf {
+      width: 790px !important;
+      max-width: 790px !important;
+      margin: 0 auto !important;
+      padding: 10px !important;
+      background: #ffffff !important;
+      box-sizing: border-box !important;
+    }
+    .boletim-modo-pdf .card-setor {
+      margin-bottom: 12px !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+    .boletim-modo-pdf .table th, 
+    .boletim-modo-pdf .table td {
+      padding: 5px 6px !important;
+      font-size: 0.85rem !important;
+    }
+    .boletim-modo-pdf .lista-acoes-integra {
+      font-size: 0.82rem !important;
+      line-height: 1.4 !important;
+    }
+
+    .card-setor {
         break-inside: avoid;
         page-break-inside: avoid;
       }

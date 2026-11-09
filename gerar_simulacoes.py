@@ -69,7 +69,7 @@ def main():
             "classe": "Baixo",
             "titulo_nivel": "NÍVEL DE CALOR 2: ATENÇÃO",
             "subtitulo_ehf": "CLASSIFICAÇÃO DO EHF: BAIXO",
-            "cor": "#ca8a04",
+            "cor": "#ffc107",
             "tmax": 35.8,
             "tmin": 24.6,
             "tmean": 30.2,

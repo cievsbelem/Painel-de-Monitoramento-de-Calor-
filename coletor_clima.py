@@ -51,7 +51,7 @@ MAPA_DESCRICOES = {
     "Baixo": {
         "titulo": "NÍVEL DE CALOR 2: ATENÇÃO",
         "subtitulo": "CLASSIFICAÇÃO DO EHF: BAIXO",
-        "cor": "#ca8a04"
+        "cor": "#ffc107"
     },
     "Severo": {
         "titulo": "NÍVEL DE CALOR 3: ALERTA",

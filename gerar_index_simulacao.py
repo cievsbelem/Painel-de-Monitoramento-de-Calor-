@@ -269,7 +269,7 @@ def main():
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="tab-atencao" data-bs-toggle="pill" data-bs-target="#conteudo-atencao" type="button" role="tab">
-              <i class="bi bi-heart-pulse-fill me-1"></i> 5. Atenção à Saúde & SAMU
+              <i class="bi bi-heart-pulse-fill me-1"></i> 5. Atenção à Saúde & Casas Especializadas
             </button>
           </li>
           <li class="nav-item" role="presentation">
@@ -311,13 +311,13 @@ const setoresChaves = [
   {{ id: "conteudo-endemias", chave: "controleEndemias", nome: "Controle de Endemias (DVS / SESMA)", icone: "bi-bug-fill" }},
   {{ id: "conteudo-vigilancia", chave: "vigSanitariaAmbiental", nome: "Vigilância Sanitária e Ambiental (DEVA / DEVS)", icone: "bi-shield-fill-check" }},
   {{ id: "conteudo-trabalhador", chave: "trabalhador", nome: "Saúde do Trabalhador (CEREST Belém)", icone: "bi-person-workspace" }},
-  {{ id: "conteudo-atencao", chave: "atencaoSaude", nome: "Atenção à Saúde (DAS / APS / DAES / SAMU 192)", icone: "bi-heart-pulse-fill" }},
+  {{ id: "conteudo-atencao", chave: "atencaoSaude", nome: "Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas especializadas)", icone: "bi-heart-pulse-fill" }},
   {{ id: "conteudo-regulacao", chave: "regulacaoComunicacao", nome: "Regulação e Comunicação em Saúde (Central de Leitos / ASCOM)", icone: "bi-hospital" }}
 ];
 
 const niveisConfig = [
   {{ chave: "Sem excesso", rotulo: "Nível 1: Normalidade", cor: "#1b5e20", headerBg: "header-nivel-1", arquivo: "nivel_1_normalidade.html" }},
-  {{ chave: "Baixo", rotulo: "Nível 2: Atenção", cor: "#ca8a04", headerBg: "header-nivel-2", arquivo: "nivel_2_atencao.html" }},
+  {{ chave: "Baixo", rotulo: "Nível 2: Atenção", cor: "#ffc107", headerBg: "header-nivel-2", arquivo: "nivel_2_atencao.html" }},
   {{ chave: "Severo", rotulo: "Nível 3: Alerta", cor: "#ea580c", headerBg: "header-nivel-3", arquivo: "nivel_3_alerta.html" }},
   {{ chave: "Extremo", rotulo: "Nível 4: Emergência", cor: "#dc2626", headerBg: "header-nivel-4", arquivo: "nivel_4_emergencia.html" }}
 ];

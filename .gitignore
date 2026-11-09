@@ -24,3 +24,7 @@ cloudflared
 .RData
 .Ruserdata/
 rsconnect/
+
+# Python cache
+__pycache__/
+*.pyc

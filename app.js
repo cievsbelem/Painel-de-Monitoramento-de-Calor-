@@ -88,14 +88,14 @@ const matrizNiveis = {
     tituloNivel: "NÍVEL DE CALOR 2: ATENÇÃO",
     subtituloEhf: "CLASSIFICAÇÃO DO EHF: BAIXO",
     rotuloCurto: "NÍVEL 2: ATENÇÃO",
-    corAlerta: "#ca8a04",
-    corTexto: "#ffffff",
+    corAlerta: "#ffc107",
+    corTexto: "#1e293b",
     icone: "bi-exclamation-circle-fill",
     statusMs: "CLASSIFICAÇÃO DO EHF: BAIXO",
     nivelContingencia: "NÍVEL DE CALOR 2: ATENÇÃO",
     populacao: "Beba água ao longo do dia, mesmo sem sede.",
     servicoSaude: "Comunicar os sinais de mal-estar pelo calor e reforçar a hidratação, com atenção aos grupos de risco.",
-    coeBadge: '<span class="badge fs-6 p-2 text-white" style="background-color: #ca8a04 !important;"><i class="bi bi-shield-exclamation"></i> OPERAÇÃO EM NÍVEL DE ATENÇÃO</span>',
+    coeBadge: '<span class="badge fs-6 p-2 text-dark" style="background-color: #ffc107 !important; border: 1px solid #d97706;"><i class="bi bi-shield-exclamation"></i> OPERAÇÃO EM NÍVEL DE ATENÇÃO</span>',
     acoesSetores: {
       cievsVe: [
         "CIEVS: Monitorar DNC relacionados à variação do clima.",
@@ -306,27 +306,33 @@ function renderizarPainel(dados) {
   // 1. Banner Pulsante
   const blocoAlerta = document.getElementById("bloco-alerta");
   if (blocoAlerta) {
+    const isDarkText = infoNivel.corTexto === '#1e293b' || classeHoje === 'Baixo';
+    const textClass = isDarkText ? "text-dark" : "text-white";
+    const badgeInnerClass = isDarkText ? "badge-alerta-inner-dark" : "badge-alerta-inner";
+    const borderColClass = isDarkText ? "border-dark border-opacity-25" : "border-white-50";
+
     blocoAlerta.style.backgroundColor = infoNivel.corAlerta;
-    blocoAlerta.style.border = "3px solid rgba(255,255,255,0.7)";
+    blocoAlerta.style.border = isDarkText ? "3px solid rgba(0, 0, 0, 0.25)" : "3px solid rgba(255, 255, 255, 0.7)";
+    blocoAlerta.className = "p-4 alerta-pulsante shadow-lg mb-4 text-center text-md-start " + (isDarkText ? "alerta-tema-escuro" : "");
     blocoAlerta.innerHTML = `
-      <div class="row align-items-center text-white">
+      <div class="row align-items-center ${textClass}">
         <div class="col-md-2 text-center">
-          <i class="bi ${infoNivel.icone}" style="font-size: 4.8rem; color: #ffffff !important;"></i>
+          <i class="bi ${infoNivel.icone}" style="font-size: 4.8rem; color: ${isDarkText ? '#1e293b' : '#ffffff'} !important;"></i>
         </div>
         <div class="col-md-7 text-start">
           <div class="mb-2">
-            <span class="badge badge-alerta-inner px-3 py-1 fw-bold text-uppercase">CIEVS BELÉM · SESMA</span>
-            <span class="badge badge-alerta-inner px-2 py-1 ms-2 fw-normal">DATA: ${dados.hoje.data_br || dados.data_base_br}</span>
+            <span class="badge ${badgeInnerClass} px-3 py-1 fw-bold text-uppercase">CIEVS BELÉM · SESMA</span>
+            <span class="badge ${badgeInnerClass} px-2 py-1 ms-2 fw-normal">DATA: ${dados.hoje.data_br || dados.data_base_br}</span>
           </div>
-          <h1 class="fw-black m-0 tracking-tight text-white display-6" style="font-weight: 900; letter-spacing: -0.01em;">${infoNivel.tituloNivel}</h1>
-          <div class="mt-2 text-white fw-bold opacity-90" style="font-size: 1.15rem; letter-spacing: 0.03em;">
+          <h1 class="fw-black m-0 tracking-tight ${textClass} display-6" style="font-weight: 900; letter-spacing: -0.01em;">${infoNivel.tituloNivel}</h1>
+          <div class="mt-2 ${textClass} fw-bold opacity-90" style="font-size: 1.15rem; letter-spacing: 0.03em;">
             ${infoNivel.subtituloEhf}
           </div>
         </div>
-        <div class="col-md-3 text-center border-start border-white-50">
-          <h6 class="text-uppercase opacity-75 mb-1 text-white">Temperatura Prevista</h6>
-          <h2 class="fw-bold mb-0 text-white">${dados.hoje.tmax} °C</h2>
-          <span class="badge badge-alerta-inner mt-2">EHF Diário: ${dados.hoje.ehf}</span>
+        <div class="col-md-3 text-center border-start ${borderColClass}">
+          <h6 class="text-uppercase opacity-75 mb-1 ${textClass}">Temperatura Prevista</h6>
+          <h2 class="fw-bold mb-0 ${textClass}">${dados.hoje.tmax} °C</h2>
+          <span class="badge ${badgeInnerClass} mt-2">EHF Diário: ${dados.hoje.ehf}</span>
         </div>
       </div>
     `;
@@ -401,7 +407,7 @@ function renderizarPainel(dados) {
       <div class="row g-3">
         <!-- 1. CIEVS Belém & Vigilância Epidemiológica -->
         <div class="col-md-4">
-          <div class="card card-setor p-3 shadow-sm h-100">
+          <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
             <h6 class="fw-bold"><i class="bi bi-activity"></i> CIEVS Belém, Vigilância Epidemiológica & NHEs</h6>
             <p class="small text-muted mb-2">Monitoramento de rumores, avaliação de risco e busca ativa hospitalar</p>
             <ul class="lista-acoes-integra">
@@ -412,7 +418,7 @@ function renderizarPainel(dados) {
         
         <!-- 2. Controle de Endemias -->
         <div class="col-md-4">
-          <div class="card card-setor p-3 shadow-sm h-100">
+          <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
             <h6 class="fw-bold"><i class="bi bi-bug-fill"></i> Controle de Endemias</h6>
             <p class="small text-muted mb-2">Horários de campo, rotinas de bloqueio e proteção ocupacional</p>
             <ul class="lista-acoes-integra">
@@ -423,7 +429,7 @@ function renderizarPainel(dados) {
         
         <!-- 3. Vigilância Sanitária e Ambiental -->
         <div class="col-md-4">
-          <div class="card card-setor p-3 shadow-sm h-100">
+          <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
             <h6 class="fw-bold"><i class="bi bi-shield-fill-check"></i> Vigilância Sanitária e Ambiental</h6>
             <p class="small text-muted mb-2">Inspeção de ILPIs, cadeia de frio, água, gelo e medidas cautelares</p>
             <ul class="lista-acoes-integra">
@@ -434,7 +440,7 @@ function renderizarPainel(dados) {
         
         <!-- 4. CEREST Saúde do Trabalhador -->
         <div class="col-md-4">
-          <div class="card card-setor p-3 shadow-sm h-100">
+          <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
             <h6 class="fw-bold"><i class="bi bi-person-workspace"></i> CEREST Saúde do Trabalhador</h6>
             <p class="small text-muted mb-2">Proteção a trabalhadores ao ar livre, EPIs e denúncias</p>
             <ul class="lista-acoes-integra">
@@ -445,8 +451,8 @@ function renderizarPainel(dados) {
         
         <!-- 5. Atenção à Saúde -->
         <div class="col-md-4">
-          <div class="card card-setor p-3 shadow-sm h-100">
-            <h6 class="fw-bold"><i class="bi bi-heart-pulse-fill"></i> Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas)</h6>
+          <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
+            <h6 class="fw-bold"><i class="bi bi-heart-pulse-fill"></i> Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas especializadas)</h6>
             <p class="small text-muted mb-2">Visitas domiciliares, climatização, resfriamento corporal e suporte intensivo</p>
             <ul class="lista-acoes-integra">
               ${ac.atencaoSaude.map(item => `<li>${item}</li>`).join('')}
@@ -456,7 +462,7 @@ function renderizarPainel(dados) {
         
         <!-- 6. Regulação e Comunicação em Saúde -->
         <div class="col-md-4">
-          <div class="card card-setor p-3 shadow-sm h-100">
+          <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
             <h6 class="fw-bold"><i class="bi bi-hospital"></i> Regulação e Comunicação em Saúde</h6>
             <p class="small text-muted mb-2">NIR hospitalar, leitos de retaguarda, boletins oficiais e combate a boatos</p>
             <ul class="lista-acoes-integra">
@@ -737,7 +743,7 @@ async function inicializarMapaBelem(dados) {
         <span>Nível 1: Normalidade</span>
       </div>
       <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
-        <span style="background:#ca8a04;width:14px;height:14px;display:inline-block;border-radius:3px;"></span>
+        <span style="background:#ffc107;width:14px;height:14px;display:inline-block;border-radius:3px;"></span>
         <span>Nível 2: Atenção</span>
       </div>
       <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
@@ -779,7 +785,7 @@ function renderizarBoletim(dados) {
         <td class="fw-bold text-dark fs-6">${p.tmax} °C</td>
         <td class="text-muted">${p.tmin || 23.0} °C</td>
         <td>
-          <span class="badge py-2 px-3 fw-bold text-white w-100" style="background-color: ${conf.corAlerta};">
+          <span class="badge py-2 px-3 fw-bold ${cls === 'Baixo' ? 'text-dark' : 'text-white'} w-100" style="background-color: ${conf.corAlerta};">
             ${conf.rotuloCurto}
           </span>
         </td>
@@ -822,26 +828,26 @@ function renderizarBoletim(dados) {
       <!-- SEÇÃO 1: NÍVEL DE CALOR DO DIA (ALERTA PISCANTE) -->
       <div class="mb-4">
         <h5 class="fw-bold titulo-padrao-escuro mb-2"><i class="bi bi-bell-fill text-danger"></i> 1. NÍVEL DE CALOR DO DIA (VIGÊNCIA HOJE)</h5>
-        <div class="p-4 rounded-3 text-white shadow-sm" style="background-color: ${infoNivel.corAlerta}; border: 2px solid rgba(255,255,255,0.7);">
+        <div class="p-4 rounded-3 shadow-sm ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'} evitar-quebra" style="background-color: ${infoNivel.corAlerta}; border: 2px solid ${classeHoje === 'Baixo' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.7)'};">
           <div class="row align-items-center">
             <div class="col-md-2 text-center mb-3 mb-md-0">
-              <i class="bi ${infoNivel.icone}" style="font-size: 4rem; color: #ffffff !important;"></i>
+              <i class="bi ${infoNivel.icone}" style="font-size: 4rem; color: ${classeHoje === 'Baixo' ? '#1e293b' : '#ffffff'} !important;"></i>
             </div>
             <div class="col-md-7 text-start">
               <div class="mb-2">
-                <span class="badge bg-white text-dark px-3 py-1 fw-bold text-uppercase">CIEVS BELÉM · SESMA</span>
-                <span class="badge bg-white text-dark px-2 py-1 ms-2 fw-normal">DATA: ${dados.hoje.data_br || dados.data_base_br}</span>
+                <span class="badge ${classeHoje === 'Baixo' ? 'bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25' : 'bg-white text-dark'} px-3 py-1 fw-bold text-uppercase">CIEVS BELÉM · SESMA</span>
+                <span class="badge ${classeHoje === 'Baixo' ? 'bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25' : 'bg-white text-dark'} px-2 py-1 ms-2 fw-normal">DATA: ${dados.hoje.data_br || dados.data_base_br}</span>
               </div>
-              <h2 class="fw-black m-0 text-white" style="font-weight: 900; letter-spacing: 0.02em;">${infoNivel.tituloNivel}</h2>
-              <div class="mt-2 text-white fw-bold opacity-90" style="font-size: 1.15rem; letter-spacing: 0.03em;">
+              <h2 class="fw-black m-0 ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'}" style="font-weight: 900; letter-spacing: 0.02em;">${infoNivel.tituloNivel}</h2>
+              <div class="mt-2 ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'} fw-bold opacity-90" style="font-size: 1.15rem; letter-spacing: 0.03em;">
                 ${infoNivel.subtituloEhf}
               </div>
             </div>
-            <div class="col-md-3 text-center border-start border-white-50">
-              <div class="small text-uppercase opacity-75 text-white">Temp. Máxima Prevista</div>
-              <h2 class="fw-bold mb-0 text-white">${dados.hoje.tmax} °C</h2>
-              <div class="small opacity-90 text-white mt-1">Mínima: ${dados.hoje.tmin || 23.0} °C</div>
-              <span class="badge bg-black bg-opacity-25 mt-2">EHF Diário: ${dados.hoje.ehf}</span>
+            <div class="col-md-3 text-center border-start ${classeHoje === 'Baixo' ? 'border-dark border-opacity-25' : 'border-white-50'}">
+              <div class="small text-uppercase opacity-75 ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'}">Temp. Máxima Prevista</div>
+              <h2 class="fw-bold mb-0 ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'}">${dados.hoje.tmax} °C</h2>
+              <div class="small opacity-90 ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'} mt-1">Mínima: ${dados.hoje.tmin || 23.0} °C</div>
+              <span class="badge ${classeHoje === 'Baixo' ? 'bg-dark bg-opacity-10 text-dark' : 'bg-black bg-opacity-25'} mt-2">EHF Diário: ${dados.hoje.ehf}</span>
             </div>
           </div>
         </div>
@@ -892,7 +898,7 @@ function renderizarBoletim(dados) {
         <p class="small text-muted mb-3">Protocolos e procedimentos setoriais ativos na rede de saúde para o <strong>${infoNivel.tituloNivel}</strong>:</p>
         <div class="row g-3">
           <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100">
+            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
               <h6 class="fw-bold"><i class="bi bi-activity"></i> CIEVS Belém, VE & NHEs</h6>
               <ul class="lista-acoes-integra">
                 ${ac.cievsVe.map(item => `<li>${item}</li>`).join('')}
@@ -900,7 +906,7 @@ function renderizarBoletim(dados) {
             </div>
           </div>
           <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100">
+            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
               <h6 class="fw-bold"><i class="bi bi-bug-fill"></i> Controle de Endemias</h6>
               <ul class="lista-acoes-integra">
                 ${ac.controleEndemias.map(item => `<li>${item}</li>`).join('')}
@@ -908,7 +914,7 @@ function renderizarBoletim(dados) {
             </div>
           </div>
           <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100">
+            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
               <h6 class="fw-bold"><i class="bi bi-shield-fill-check"></i> Vigilância Sanitária e Ambiental</h6>
               <ul class="lista-acoes-integra">
                 ${ac.vigSanitariaAmbiental.map(item => `<li>${item}</li>`).join('')}
@@ -916,7 +922,7 @@ function renderizarBoletim(dados) {
             </div>
           </div>
           <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100">
+            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
               <h6 class="fw-bold"><i class="bi bi-person-workspace"></i> CEREST Saúde do Trabalhador</h6>
               <ul class="lista-acoes-integra">
                 ${ac.trabalhador.map(item => `<li>${item}</li>`).join('')}
@@ -924,15 +930,15 @@ function renderizarBoletim(dados) {
             </div>
           </div>
           <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100">
-              <h6 class="fw-bold"><i class="bi bi-heart-pulse-fill"></i> Atenção à Saúde (APS, Urgência, SAMU)</h6>
+            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
+              <h6 class="fw-bold"><i class="bi bi-heart-pulse-fill"></i> Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas especializadas)</h6>
               <ul class="lista-acoes-integra">
                 ${ac.atencaoSaude.map(item => `<li>${item}</li>`).join('')}
               </ul>
             </div>
           </div>
           <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100">
+            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
               <h6 class="fw-bold"><i class="bi bi-hospital"></i> Regulação e Comunicação em Saúde</h6>
               <ul class="lista-acoes-integra">
                 ${ac.regulacaoComunicacao.map(item => `<li>${item}</li>`).join('')}
@@ -959,37 +965,52 @@ function baixarBoletimPDF() {
   const botoesBaixar = document.querySelectorAll(".btn-baixar-pdf");
   botoesBaixar.forEach(btn => {
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Gerando PDF...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Formatando e Gerando PDF...';
   });
 
+  // Aplica classe de formatação automática para A4 (evita cortes)
+  elemento.classList.add("boletim-modo-pdf");
+
+  const dataAtual = dadosClimaCache?.data_base_iso || (new Date().toISOString().slice(0, 10));
   const opt = {
-    margin: [8, 8, 8, 8],
-    filename: 'Boletim_Informe_do_Clima_Belem_' + (new Date().toISOString().slice(0, 10)) + '.pdf',
+    margin: [10, 10, 10, 10],
+    filename: 'Boletim_Oficial_Calor_Belem_' + dataAtual + '.pdf',
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, logging: false },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    html2canvas: { 
+      scale: 2, 
+      useCORS: true, 
+      logging: false,
+      scrollY: 0,
+      windowWidth: 1024
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { 
+      mode: ['avoid-all', 'css', 'legacy'],
+      avoid: ['.card-setor', '.card', 'tr', '.table-responsive', '.evitar-quebra', '.row']
+    }
   };
 
-  if (typeof html2pdf !== 'undefined') {
-    html2pdf().set(opt).from(elemento).save().then(() => {
-      botoesBaixar.forEach(btn => {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill me-1"></i> Baixar Arquivo em PDF';
-      });
-    }).catch(err => {
-      console.warn("Falha no html2pdf, abrindo caixa de impressão para salvar em PDF:", err);
-      window.print();
-      botoesBaixar.forEach(btn => {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill me-1"></i> Baixar Arquivo em PDF';
-      });
-    });
-  } else {
-    window.print();
+  const restaurarBotoes = () => {
+    elemento.classList.remove("boletim-modo-pdf");
     botoesBaixar.forEach(btn => {
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill me-1"></i> Baixar Arquivo em PDF';
     });
+  };
+
+  if (typeof html2pdf !== 'undefined') {
+    setTimeout(() => {
+      html2pdf().set(opt).from(elemento).save().then(() => {
+        restaurarBotoes();
+      }).catch(err => {
+        console.warn("Falha no html2pdf, abrindo caixa de impressão para salvar em PDF:", err);
+        restaurarBotoes();
+        window.print();
+      });
+    }, 150);
+  } else {
+    restaurarBotoes();
+    window.print();
   }
 }
 
