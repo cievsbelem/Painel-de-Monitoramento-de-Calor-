@@ -214,6 +214,8 @@ window.DADOS_CLIMA_EMBUTIDOS = {dados_json};
 window.MALHA_BELEM_EMBUTIDA = {malha_txt};
 """
         js_mod = bloco_dados + "\n" + js_base
+        if logo_b64:
+            js_mod = js_mod.replace('src="logo_sesma.png"', f'src="{logo_b64}"')
         
         # Assegurar que carregarDadosClima usa DADOS_CLIMA_EMBUTIDOS imediatamente
         js_mod = js_mod.replace(

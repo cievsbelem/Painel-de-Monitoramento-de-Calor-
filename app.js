@@ -774,186 +774,227 @@ function renderizarBoletim(dados) {
   const classeHoje = normalizarClasse(dados.hoje.classe);
   const infoNivel = matrizNiveis[classeHoje] || matrizNiveis["Sem excesso"];
   const ac = infoNivel.acoesSetores;
+  const isDarkText = infoNivel.corTexto === '#1e293b' || classeHoje === 'Baixo';
+  const textClass = isDarkText ? "text-dark" : "text-white";
+  const borderColClass = isDarkText ? "border-dark border-opacity-25" : "border-white-50";
+  const badgeClass = isDarkText ? "bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25" : "bg-white text-dark";
 
   const linhasPrevisao = (dados.previsoes || []).map(p => {
     const cls = normalizarClasse(p.classe);
     const conf = matrizNiveis[cls] || matrizNiveis["Sem excesso"];
+    const isDarkBadge = cls === 'Baixo';
     return `
       <tr>
-        <td class="fw-bold">${p.dia}</td>
-        <td>${p.data_br}</td>
-        <td class="fw-bold text-dark fs-6">${p.tmax} °C</td>
-        <td class="text-muted">${p.tmin || 23.0} °C</td>
-        <td>
-          <span class="badge py-2 px-3 fw-bold ${cls === 'Baixo' ? 'text-dark' : 'text-white'} w-100" style="background-color: ${conf.corAlerta};">
+        <td class="fw-bold py-1">${p.dia}</td>
+        <td class="py-1">${p.data_br}</td>
+        <td class="fw-bold text-dark py-1">${p.tmax} °C</td>
+        <td class="text-muted py-1">${p.tmin || 23.0} °C</td>
+        <td class="py-1">
+          <span class="badge py-1 px-2 fw-bold ${isDarkBadge ? 'text-dark' : 'text-white'} w-100" style="background-color: ${conf.corAlerta}; font-size: 0.72rem;">
             ${conf.rotuloCurto}
           </span>
         </td>
-        <td class="fw-semibold small">${conf.subtituloEhf}</td>
-        <td><code>${p.ehf}</code></td>
+        <td class="fw-semibold py-1" style="font-size: 0.72rem;">${conf.subtituloEhf}</td>
+        <td class="py-1"><code>${p.ehf}</code></td>
       </tr>
     `;
   }).join('');
 
   container.innerHTML = `
     <div class="boletim-documento bg-white p-3 p-md-4 rounded shadow-sm border">
-      <!-- CABEÇALHO DO BOLETIM -->
-      <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3 flex-wrap gap-3">
-        <div class="d-flex align-items-center gap-3">
-          <img src="logo_sesma.png" alt="SESMA" style="height: 56px; width: auto; object-fit: contain;">
-          <div>
-            <h5 class="fw-bold mb-0 text-dark" style="letter-spacing: 0.02em;">PREFEITURA MUNICIPAL DE BELÉM</h5>
-            <h6 class="fw-bold mb-0 text-primary" style="font-size: 0.95rem;">SECRETARIA MUNICIPAL DE SAÚDE · SESMA</h6>
-            <p class="small text-muted mb-0">Centro de Informações Estratégicas em Vigilância em Saúde · CIEVS Belém</p>
+      
+      <!-- ================= PÁGINA 1: STATUS DO DIA E PREVISÃO ================= -->
+      <div class="boletim-pagina-1 evitar-quebra">
+        <!-- CABEÇALHO DO BOLETIM -->
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2 flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <img src="logo_sesma.png" alt="SESMA" style="height: 44px; width: auto; object-fit: contain;">
+            <div>
+              <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.92rem; letter-spacing: 0.02em;">PREFEITURA MUNICIPAL DE BELÉM</h6>
+              <div class="fw-bold text-primary" style="font-size: 0.82rem;">SECRETARIA MUNICIPAL DE SAÚDE · SESMA</div>
+              <p class="small text-muted mb-0" style="font-size: 0.72rem;">Centro de Informações Estratégicas em Vigilância em Saúde · CIEVS Belém</p>
+            </div>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-primary px-2 py-1" style="font-size: 0.76rem;"><i class="bi bi-file-earmark-medical"></i> INFORME DO CLIMA EM BELÉM</span>
+            <p class="text-muted mt-1 mb-0" style="font-size: 0.70rem;">Emissão: <strong>${dados.hoje.data_br || dados.data_base_br}</strong> às <strong>${dados.hora_consulta || '12:00:00'}</strong></p>
           </div>
         </div>
-        <div class="text-end">
-          <span class="badge bg-primary fs-6 px-3 py-2"><i class="bi bi-file-earmark-medical"></i> INFORME DO CLIMA EM BELÉM</span>
-          <p class="small text-muted mt-1 mb-0">Data de Emissão: <strong>${dados.hoje.data_br || dados.data_base_br}</strong> às <strong>${dados.hora_consulta || '12:00:00'}</strong></p>
-        </div>
-      </div>
 
-      <div class="text-center mb-4 pb-2 border-bottom">
-        <h3 class="fw-black text-dark mb-1" style="font-weight: 800; letter-spacing: -0.01em;">BOLETIM OFICIAL: INFORME DO CLIMA EM BELÉM</h3>
-        <p class="text-muted mb-2">Sistema Oficial de Vigilância de Excesso de Calor e Plano de Contingência Local</p>
-        <div class="d-flex justify-content-center gap-3 small text-muted flex-wrap">
-          <span><strong>Município:</strong> Belém - PA (1501402)</span>
-          <span>•</span>
-          <span><strong>Fonte Oficial:</strong> <a href="https://clima.saude.gov.br/pa/belem?data=2026-10-27&modo=ehf" target="_blank" class="text-decoration-none">Ministério da Saúde</a></span>
-          <span>•</span>
-          <span><strong>Metodologia:</strong> EHF (Excess Heat Factor)</span>
+        <!-- TÍTULO CENTRAL -->
+        <div class="text-center mb-3 pb-2 border-bottom">
+          <h4 class="fw-black text-dark mb-0" style="font-weight: 800; letter-spacing: -0.01em; font-size: 1.22rem;">BOLETIM OFICIAL: INFORME DO CLIMA EM BELÉM</h4>
+          <p class="text-muted mb-1" style="font-size: 0.78rem;">Sistema Oficial de Vigilância de Excesso de Calor e Plano de Contingência Local</p>
+          <div class="d-flex justify-content-center gap-3 text-muted flex-wrap" style="font-size: 0.72rem;">
+            <span><strong>Município:</strong> Belém - PA (1501402)</span>
+            <span>•</span>
+            <span><strong>Fonte Oficial:</strong> <a href="https://clima.saude.gov.br/pa/belem?modo=ehf" target="_blank" class="text-decoration-none">Ministério da Saúde</a></span>
+            <span>•</span>
+            <span><strong>Metodologia:</strong> EHF (Excess Heat Factor)</span>
+          </div>
         </div>
-      </div>
 
-      <!-- SEÇÃO 1: NÍVEL DE CALOR DO DIA (ALERTA PISCANTE) -->
-      <div class="mb-4">
-        <h5 class="fw-bold titulo-padrao-escuro mb-2"><i class="bi bi-bell-fill text-danger"></i> 1. NÍVEL DE CALOR DO DIA (VIGÊNCIA HOJE)</h5>
-        <div class="p-4 rounded-3 shadow-sm ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'} evitar-quebra" style="background-color: ${infoNivel.corAlerta}; border: 2px solid ${classeHoje === 'Baixo' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.7)'};">
-          <div class="row align-items-center">
-            <div class="col-md-2 text-center mb-3 mb-md-0">
-              <i class="bi ${infoNivel.icone}" style="font-size: 4rem; color: ${classeHoje === 'Baixo' ? '#1e293b' : '#ffffff'} !important;"></i>
-            </div>
-            <div class="col-md-7 text-start">
-              <div class="mb-2">
-                <span class="badge ${classeHoje === 'Baixo' ? 'bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25' : 'bg-white text-dark'} px-3 py-1 fw-bold text-uppercase">CIEVS BELÉM · SESMA</span>
-                <span class="badge ${classeHoje === 'Baixo' ? 'bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25' : 'bg-white text-dark'} px-2 py-1 ms-2 fw-normal">DATA: ${dados.hoje.data_br || dados.data_base_br}</span>
+        <!-- SEÇÃO 1: NÍVEL DE CALOR DO DIA (VIGÊNCIA HOJE) -->
+        <div class="mb-3">
+          <h6 class="fw-bold titulo-padrao-escuro mb-2" style="font-size: 0.88rem;"><i class="bi bi-bell-fill text-danger me-1"></i> 1. NÍVEL DE CALOR DO DIA (VIGÊNCIA HOJE)</h6>
+          
+          <div class="p-3 rounded-3 shadow-sm ${textClass}" style="background-color: ${infoNivel.corAlerta}; border: 1.5px solid ${isDarkText ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.7)'};">
+            <div class="row align-items-center g-2">
+              <div class="col-2 text-center">
+                <i class="bi ${infoNivel.icone}" style="font-size: 2.8rem; color: ${isDarkText ? '#1e293b' : '#ffffff'} !important;"></i>
               </div>
-              <h2 class="fw-black m-0 ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'}" style="font-weight: 900; letter-spacing: 0.02em;">${infoNivel.tituloNivel}</h2>
-              <div class="mt-2 ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'} fw-bold opacity-90" style="font-size: 1.15rem; letter-spacing: 0.03em;">
-                ${infoNivel.subtituloEhf}
+              <div class="col-7 text-start">
+                <div class="mb-1">
+                  <span class="badge ${badgeClass} px-2 py-0 fw-bold text-uppercase" style="font-size: 0.68rem;">CIEVS BELÉM · SESMA</span>
+                  <span class="badge ${badgeClass} px-2 py-0 ms-1 fw-normal" style="font-size: 0.68rem;">DATA: ${dados.hoje.data_br || dados.data_base_br}</span>
+                </div>
+                <h4 class="fw-black m-0 ${textClass}" style="font-weight: 800; font-size: 1.25rem;">${infoNivel.tituloNivel}</h4>
+                <div class="mt-1 ${textClass} fw-bold opacity-90" style="font-size: 0.85rem;">
+                  ${infoNivel.subtituloEhf}
+                </div>
+              </div>
+              <div class="col-3 text-center border-start ${borderColClass}">
+                <div class="text-uppercase opacity-75 ${textClass}" style="font-size: 0.68rem;">Temp. Máxima Prevista</div>
+                <h3 class="fw-bold mb-0 ${textClass}" style="font-size: 1.5rem;">${dados.hoje.tmax} °C</h3>
+                <div class="opacity-90 ${textClass}" style="font-size: 0.72rem;">Mínima: ${dados.hoje.tmin || 23.0} °C</div>
+                <span class="badge ${isDarkText ? 'bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25' : 'bg-black bg-opacity-25 text-white'} px-2 py-1 mt-1" style="font-size: 0.68rem;">EHF Diário: ${dados.hoje.ehf}</span>
               </div>
             </div>
-            <div class="col-md-3 text-center border-start ${classeHoje === 'Baixo' ? 'border-dark border-opacity-25' : 'border-white-50'}">
-              <div class="small text-uppercase opacity-75 ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'}">Temp. Máxima Prevista</div>
-              <h2 class="fw-bold mb-0 ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'}">${dados.hoje.tmax} °C</h2>
-              <div class="small opacity-90 ${classeHoje === 'Baixo' ? 'text-dark' : 'text-white'} mt-1">Mínima: ${dados.hoje.tmin || 23.0} °C</div>
-              <span class="badge ${classeHoje === 'Baixo' ? 'bg-dark bg-opacity-10 text-dark' : 'bg-black bg-opacity-25'} mt-2">EHF Diário: ${dados.hoje.ehf}</span>
+          </div>
+
+          <!-- RECOMENDAÇÕES DA POPULAÇÃO E SERVIÇOS DE SAÚDE -->
+          <div class="row g-2 mt-1">
+            <div class="col-6">
+              <div class="p-2 bg-light rounded border h-100" style="border-left: 3px solid #1e3a8a !important;">
+                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-people-fill me-1"></i> O QUE FAZER HOJE: POPULAÇÃO</h6>
+                <p class="mb-0 text-dark" style="font-size: 0.75rem; line-height: 1.35;">${infoNivel.populacao}</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 bg-light rounded border h-100" style="border-left: 3px solid #1e3a8a !important;">
+                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-hospital me-1"></i> O QUE FAZER HOJE: SERVIÇOS DE SAÚDE</h6>
+                <p class="mb-0 text-dark" style="font-size: 0.75rem; line-height: 1.35;">${infoNivel.servicoSaude}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="row g-3 mt-2">
-          <div class="col-md-6">
-            <div class="p-3 bg-light rounded border h-100" style="border-left: 4px solid #1e3a8a !important;">
-              <h6 class="fw-bold text-primary mb-1"><i class="bi bi-people-fill"></i> O QUE FAZER HOJE: POPULAÇÃO</h6>
-              <p class="mb-0 text-dark small" style="line-height: 1.5;">${infoNivel.populacao}</p>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="p-3 bg-light rounded border h-100" style="border-left: 4px solid #1e3a8a !important;">
-              <h6 class="fw-bold text-primary mb-1"><i class="bi bi-hospital"></i> O QUE FAZER HOJE: SERVIÇOS DE SAÚDE</h6>
-              <p class="mb-0 text-dark small" style="line-height: 1.5;">${infoNivel.servicoSaude}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SEÇÃO 2: PREVISÃO OPERACIONAL DE CALOR -->
-      <div class="mb-4">
-        <h5 class="fw-bold titulo-padrao-escuro mb-1"><i class="bi bi-calendar3 text-primary"></i> 2. PREVISÃO OPERACIONAL DE CALOR</h5>
-        <p class="small text-muted mb-2">(D+0 A D+4) — D+0 é a medição/previsão atual; D+1 a D+4 sinalizam a tendência para Belém.</p>
-        <div class="table-responsive">
-          <table class="table table-bordered table-striped align-middle text-center mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Referência</th>
-                <th>Data</th>
-                <th>Temp. Máx</th>
-                <th>Temp. Mín</th>
-                <th>Nível de Calor</th>
-                <th>Classificação do EHF</th>
-                <th>Fator EHF</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${linhasPrevisao}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- SEÇÃO 3: AÇÕES DE RESPOSTA DOS SETORES DE BELÉM (PARA O NÍVEL VIGENTE) -->
-      <div class="mb-4">
-        <h5 class="fw-bold titulo-padrao-escuro mb-1"><i class="bi bi-diagram-3-fill text-primary"></i> 3. AÇÕES DE RESPOSTA DOS SETORES DE BELÉM (PARA O NÍVEL VIGENTE)</h5>
-        <p class="small text-muted mb-3">Protocolos e procedimentos setoriais ativos na rede de saúde para o <strong>${infoNivel.tituloNivel}</strong>:</p>
-        <div class="row g-3">
-          <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
-              <h6 class="fw-bold"><i class="bi bi-activity"></i> CIEVS Belém, VE & NHEs</h6>
-              <ul class="lista-acoes-integra">
-                ${ac.cievsVe.map(item => `<li>${item}</li>`).join('')}
-              </ul>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
-              <h6 class="fw-bold"><i class="bi bi-bug-fill"></i> Controle de Endemias</h6>
-              <ul class="lista-acoes-integra">
-                ${ac.controleEndemias.map(item => `<li>${item}</li>`).join('')}
-              </ul>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
-              <h6 class="fw-bold"><i class="bi bi-shield-fill-check"></i> Vigilância Sanitária e Ambiental</h6>
-              <ul class="lista-acoes-integra">
-                ${ac.vigSanitariaAmbiental.map(item => `<li>${item}</li>`).join('')}
-              </ul>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
-              <h6 class="fw-bold"><i class="bi bi-person-workspace"></i> CEREST Saúde do Trabalhador</h6>
-              <ul class="lista-acoes-integra">
-                ${ac.trabalhador.map(item => `<li>${item}</li>`).join('')}
-              </ul>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
-              <h6 class="fw-bold"><i class="bi bi-heart-pulse-fill"></i> Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas especializadas)</h6>
-              <ul class="lista-acoes-integra">
-                ${ac.atencaoSaude.map(item => `<li>${item}</li>`).join('')}
-              </ul>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card card-setor p-3 shadow-sm h-100 evitar-quebra">
-              <h6 class="fw-bold"><i class="bi bi-hospital"></i> Regulação e Comunicação em Saúde</h6>
-              <ul class="lista-acoes-integra">
-                ${ac.regulacaoComunicacao.map(item => `<li>${item}</li>`).join('')}
-              </ul>
-            </div>
+        <!-- SEÇÃO 2: PREVISÃO OPERACIONAL DE CALOR -->
+        <div class="mb-2">
+          <h6 class="fw-bold titulo-padrao-escuro mb-1" style="font-size: 0.88rem;"><i class="bi bi-calendar3 text-primary me-1"></i> 2. PREVISÃO OPERACIONAL DE CALOR (D+0 A D+4)</h6>
+          <p class="text-muted mb-2" style="font-size: 0.72rem;">D+0 indica o patamar corrente; D+1 a D+4 sinalizam a tendência para o município de Belém.</p>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered table-striped align-middle text-center mb-0" style="font-size: 0.74rem;">
+              <thead class="table-light">
+                <tr>
+                  <th class="py-1">Referência</th>
+                  <th class="py-1">Data</th>
+                  <th class="py-1">Temp. Máx</th>
+                  <th class="py-1">Temp. Mín</th>
+                  <th class="py-1">Nível de Calor</th>
+                  <th class="py-1">Classificação do EHF</th>
+                  <th class="py-1">Fator EHF</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${linhasPrevisao}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- RODAPÉ INSTITUCIONAL DO BOLETIM -->
-      <div class="border-top pt-3 mt-4 text-center text-muted small">
-        <p class="mb-1"><strong>Prefeitura Municipal de Belém · Secretaria Municipal de Saúde (SESMA)</strong></p>
-        <p class="mb-1">Centro de Informações Estratégicas em Vigilância em Saúde (CIEVS Belém) · Vigilância de Eventos Climáticos</p>
-        <p class="mb-0">Página oficial do Ministério da Saúde: <a href="https://clima.saude.gov.br/pa/belem?data=2026-10-27&modo=ehf" target="_blank" class="text-decoration-none">https://clima.saude.gov.br/pa/belem?data=2026-10-27&modo=ehf</a></p>
+      <!-- QUEBRA DE PÁGINA NATIVA DO HTML2PDF / CSS PRINT -->
+      <div class="html2pdf__page-break"></div>
+
+      <!-- ================= PÁGINA 2: AÇÕES DE RESPOSTA DOS SETORES ================= -->
+      <div class="boletim-pagina-2 pt-2">
+        <!-- MINI CABEÇALHO DA PÁGINA 2 -->
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-1 mb-2">
+          <div class="d-flex align-items-center gap-2">
+            <img src="logo_sesma.png" alt="SESMA" style="height: 26px; width: auto; object-fit: contain;">
+            <span class="fw-bold text-dark" style="font-size: 0.75rem; letter-spacing: 0.02em;">PREFEITURA DE BELÉM · SESMA · CIEVS BELÉM</span>
+          </div>
+          <span class="badge bg-secondary px-2 py-1" style="font-size: 0.68rem;"><i class="bi bi-file-earmark-text"></i> PÁGINA 2 — AÇÕES DOS SETORES</span>
+        </div>
+
+        <!-- SEÇÃO 3: AÇÕES DE RESPOSTA DOS SETORES -->
+        <div class="mb-2">
+          <h6 class="fw-bold titulo-padrao-escuro mb-1" style="font-size: 0.90rem;"><i class="bi bi-diagram-3-fill text-primary me-1"></i> 3. AÇÕES DE RESPOSTA DOS SETORES DE BELÉM (PARA O NÍVEL VIGENTE)</h6>
+          <p class="text-muted mb-2" style="font-size: 0.72rem;">Protocolos setoriais e procedimentos operacionais ativos na rede municipal para o <strong>${infoNivel.tituloNivel}</strong>:</p>
+
+          <!-- GRADE DE 2 COLUNAS (LARGURA AMPLA IDEAL PARA A4) -->
+          <div class="row g-2">
+            <!-- 1. CIEVS Belém, VE & NHEs -->
+            <div class="col-6">
+              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
+                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-activity me-1"></i> 1. CIEVS Belém, VE & NHEs</h6>
+                <ul class="lista-acoes-boletim mb-0">
+                  ${ac.cievsVe.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+
+            <!-- 2. Controle de Endemias -->
+            <div class="col-6">
+              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
+                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-bug-fill me-1"></i> 2. Controle de Endemias (DVS)</h6>
+                <ul class="lista-acoes-boletim mb-0">
+                  ${ac.controleEndemias.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+
+            <!-- 3. Vigilância Sanitária e Ambiental -->
+            <div class="col-6">
+              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
+                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-shield-fill-check me-1"></i> 3. Vigilância Sanitária e Ambiental</h6>
+                <ul class="lista-acoes-boletim mb-0">
+                  ${ac.vigSanitariaAmbiental.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+
+            <!-- 4. CEREST Saúde do Trabalhador -->
+            <div class="col-6">
+              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
+                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-person-workspace me-1"></i> 4. CEREST Saúde do Trabalhador</h6>
+                <ul class="lista-acoes-boletim mb-0">
+                  ${ac.trabalhador.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+
+            <!-- 5. Atenção à Saúde -->
+            <div class="col-6">
+              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
+                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-heart-pulse-fill me-1"></i> 5. Atenção à Saúde (APS, Urgência/Emergência, SAMU e Casas especializadas)</h6>
+                <ul class="lista-acoes-boletim mb-0">
+                  ${ac.atencaoSaude.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+
+            <!-- 6. Regulação e Comunicação em Saúde -->
+            <div class="col-6">
+              <div class="card card-setor-boletim p-2 shadow-sm h-100 evitar-quebra" style="border-left: 3px solid #1e3a8a;">
+                <h6 class="fw-bold text-primary mb-1" style="font-size: 0.78rem;"><i class="bi bi-hospital me-1"></i> 6. Regulação & Comunicação (Central de Leitos / ASCOM)</h6>
+                <ul class="lista-acoes-boletim mb-0">
+                  ${ac.regulacaoComunicacao.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RODAPÉ INSTITUCIONAL DO BOLETIM -->
+        <div class="border-top pt-2 mt-3 text-center text-muted evitar-quebra" style="font-size: 0.68rem;">
+          <p class="mb-0 fw-bold">Prefeitura Municipal de Belém · Secretaria Municipal de Saúde (SESMA)</p>
+          <p class="mb-0">Centro de Informações Estratégicas em Vigilância em Saúde (CIEVS Belém) · Vigilância de Eventos Climáticos</p>
+          <p class="mb-0">Página oficial: <a href="https://clima.saude.gov.br/pa/belem?modo=ehf" target="_blank" class="text-decoration-none">clima.saude.gov.br</a> (ECMWF & Ministério da Saúde)</p>
+        </div>
       </div>
+
     </div>
   `;
 }
@@ -968,12 +1009,12 @@ function baixarBoletimPDF() {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Formatando e Gerando PDF...';
   });
 
-  // Aplica classe de formatação automática para A4 (evita cortes)
+  // Aplica classe calibrada para a proporção exata da folha A4 (evita cortes de página)
   elemento.classList.add("boletim-modo-pdf");
 
   const dataAtual = dadosClimaCache?.data_base_iso || (new Date().toISOString().slice(0, 10));
   const opt = {
-    margin: [10, 10, 10, 10],
+    margin: [6, 6, 6, 6], // Margens de 6mm para máximo aproveitamento do espaço A4
     filename: 'Boletim_Oficial_Calor_Belem_' + dataAtual + '.pdf',
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { 
@@ -981,12 +1022,13 @@ function baixarBoletimPDF() {
       useCORS: true, 
       logging: false,
       scrollY: 0,
-      windowWidth: 1024
+      windowWidth: 800
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak: { 
-      mode: ['avoid-all', 'css', 'legacy'],
-      avoid: ['.card-setor', '.card', 'tr', '.table-responsive', '.evitar-quebra', '.row']
+      mode: ['css', 'legacy'],
+      before: '.html2pdf__page-break',
+      avoid: ['.evitar-quebra', '.card-setor-boletim', '.card', 'tr', '.table-responsive']
     }
   };
 
@@ -1017,6 +1059,7 @@ function baixarBoletimPDF() {
 function imprimirBoletim() {
   window.print();
 }
+
 
 // Carrega os dados climáticos atuais
 function carregarDadosClima() {

@@ -190,6 +190,7 @@ def gerar_html_autocontido(payload):
             if logo_b64:
                 html_base = html_base.replace('src="logo_sesma.png"', f'src="{logo_b64}"')
                 html_base = html_base.replace('src="imagens_locais/logo_sesma.png"', f'src="{logo_b64}"')
+                js_base = js_base.replace('src="logo_sesma.png"', f'src="{logo_b64}"')
 
             bloco_dados = f"""
 window.DADOS_CLIMA_EMBUTIDOS = {dados_txt};
